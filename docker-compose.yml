@@ -5,14 +5,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    entrypoint: /entrypoint.sh
     command: gunicorn --bind 0.0.0.0:8000 src.main.wsgi:application
     ports:
       - "8000:8000"
     volumes:
       - .:/code
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - .env
     networks:
@@ -44,7 +44,8 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx.conf:ro
     depends_on:
-      - web
+      web:
+        condition: service_healthy
     networks:
       - web_network
     healthcheck:

@@ -21,7 +21,12 @@ RUN pip install gunicorn
 COPY . /code/
 
 # Install dependencies
+COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Run Gunicorn when the container starts
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "src.main.wsgi:application"]
+# Copy entrypoint.sh and make it executable
+COPY ./entrypoint.sh /lms/entrypoint.sh
+RUN chmod +x /lms/entrypoint.sh
+
+# Run entrypoint.sh
+ENTRYPOINT ["/lms/entrypoint.sh"]
