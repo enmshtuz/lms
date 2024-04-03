@@ -11,8 +11,7 @@ services:
     volumes:
       - .:/code
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     env_file:
       - .env
     networks:
@@ -44,8 +43,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx.conf:ro
     depends_on:
-      web:
-        condition: service_healthy
+      - web
     networks:
       - web_network
     healthcheck:
