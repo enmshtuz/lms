@@ -5,7 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ./entrypoint.sh gunicorn --bind 0.0.0.0:8000 src.main.wsgi:application
+    entrypoint: /entrypoint.sh
+    command: gunicorn --bind 0.0.0.0:8000 src.main.wsgi:application
     ports:
       - "8000:8000"
     volumes:
@@ -55,8 +56,9 @@ services:
 
 networks:
   web_network:
+    driver: bridge
   web_db_network:
-  nginx:
+    driver: bridge
 
 volumes:
   db_data:
