@@ -14,8 +14,6 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Gunicorn
-RUN pip install gunicorn
 
 # Copy the rest of the application code into the container
 COPY . /code/
@@ -23,6 +21,9 @@ COPY . /code/
 # Install dependencies
 COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Freeze dependencies
+RUN pip freeze > requirements.txt
 
 # Copy entrypoint.sh and make it executable
 COPY ./entrypoint.sh /lms/entrypoint.sh
