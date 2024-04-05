@@ -22,8 +22,6 @@ COPY . /code/
 COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Freeze dependencies
-RUN pip freeze > requirements.txt
 
 # Copy entrypoint.sh and make it executable
 COPY ./entrypoint.sh /lms/entrypoint.sh
