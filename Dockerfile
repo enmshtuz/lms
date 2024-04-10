@@ -20,7 +20,6 @@ COPY . /code/
 
 # Install dependencies
 COPY ./requirements.txt .
-RUN pip install django-admin-soft-dashboard
 RUN pip install --no-cache-dir -r requirements.txt
 
 
