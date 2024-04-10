@@ -20,12 +20,12 @@ services:
       db:
         condition: service_healthy
     env_file:
-      - .env
+      - ./.env
     networks:
       - web_network
       - web_db_network
     healthcheck:
-      test: [ "CMD-SHELL", "curl 0.0.0.0:8000" ]
+      test: [ "CMD-SHELL", "curl 127.0.0.1:8000" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,7 +34,7 @@ services:
     image: mysql:latest
     container_name: lms-db
     env_file:
-      - .env
+      - ./.env
     volumes:
       - db_data:/var/lib/mysql
     networks:
@@ -51,6 +51,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx.conf:ro
+#      - ./src/lms/static:/lms/static:ro #this is new
     depends_on:
       web:
         condition: service_healthy
@@ -65,7 +66,7 @@ services:
 
 networks:
   web_network:
-    *network-driver
+    driver: bridge #this part is new
   web_db_network:
     *network-driver
 
