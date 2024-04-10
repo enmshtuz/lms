@@ -7,3 +7,5 @@ __pycache__
 /lms/__pycache__
 mediafiles
 src/db.sqlite3
+src/static/
+static/
