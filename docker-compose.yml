@@ -1,0 +1,76 @@
+version: '3.8'
+
+x-network-driver: &network-driver
+  driver: bridge
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:8000 src.main.wsgi:application --workers 3 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/code
+      - static_volume:/app/static
+      - media_volume:/app/media
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ./.env
+    networks:
+      - web_network
+      - web_db_network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl 127.0.0.1:8000" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db:
+    image: mysql:latest
+    container_name: lms-db
+    env_file:
+      - ./.env
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - web_db_network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "-padmin" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx.conf:ro
+#      - ./src/lms/static:/lms/static:ro #this is new
+    depends_on:
+      web:
+        condition: service_healthy
+    networks:
+      - web_network
+    healthcheck:
+      test: [ "CMD", "nginx", "-t" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+networks:
+  web_network:
+    driver: bridge #this part is new
+  web_db_network:
+    *network-driver
+
+volumes:
+  db_data:
+  static_volume:
+  media_volume:
