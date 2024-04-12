@@ -5,8 +5,8 @@ FROM python:3.12.2
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Set the working directory in the container
-WORKDIR /code
+ENV APP_HOME=/code
+WORKDIR $APP_HOME
 
 # Install system dependencies
 RUN apt-get update \
@@ -24,8 +24,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 
 # Copy entrypoint.sh and make it executable
-COPY ./entrypoint.sh /lms/entrypoint.sh
-RUN chmod +x /lms/entrypoint.sh
+COPY ./entrypoint.sh /code/entrypoint.sh
+RUN sed -i 's/\r$//g' $APP_HOME/entrypoint.sh
+RUN chmod +x /code/entrypoint.sh
 
 # Run entrypoint.sh
-ENTRYPOINT ["/lms/entrypoint.sh"]
+ENTRYPOINT ["/code/entrypoint.sh"]
