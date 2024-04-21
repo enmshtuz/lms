@@ -1,10 +1,7 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, UsernameField, \
-    PasswordResetForm, SetPasswordForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
-
 
 class RegistrationForm(UserCreationForm):
     password1 = forms.CharField(
@@ -44,3 +41,20 @@ class RegistrationForm(UserCreationForm):
                 'placeholder': 'Last Name'
             })
         }
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email address is already in use.")
+        return email
+
+
+class ResendVerificationEmailForm(forms.Form):
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'placeholder': 'Enter your email'}))
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email address is not associated with any user.")
+        return email
