@@ -1,0 +1,106 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Quiz Detail</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h1>Quiz Detail</h1>-->
+<!--    <p>Title: {{ quiz.title }}</p>-->
+<!--    <p>Complexity: {{ quiz.complexity }}</p>-->
+<!--    <p>Attempts: {{ quiz.attempts }}</p>-->
+<!--    <p>Deadline: {{ quiz.deadline }} minutes</p>-->
+<!--    <p>Success Criteria: {{ quiz.success_criteria }}</p>-->
+
+<!--    <h2>Add Question</h2>-->
+<!--    <div id="questions">-->
+<!--        <button type="button" id="add_question">Add Question</button>-->
+<!--    </div>-->
+
+<!--    <form method="post">-->
+<!--        {% csrf_token %}-->
+<!--        <input type="hidden" name="total_questions" value="0">-->
+<!--        <button type="submit">Save</button>-->
+<!--    </form>-->
+
+<!--    <script>-->
+<!--        let questionCount = 0;-->
+<!--        let answerCount = 0;-->
+
+<!--        document.getElementById('add_question').addEventListener('click', function () {-->
+<!--            const questionDiv = document.createElement('div');-->
+<!--            questionDiv.innerHTML = `-->
+<!--                <label for="question_${questionCount}">Question</label>-->
+<!--                <input type="text" name="question_${questionCount}" required>-->
+<!--                <label for="question_type_${questionCount}">Question Type</label>-->
+<!--                <select name="question_type_${questionCount}" required>-->
+<!--                    <option value="radio">Radio</option>-->
+<!--                    <option value="checkbox">Checkbox</option>-->
+<!--                </select>-->
+<!--                <div class="answers" id="answers_${questionCount}">-->
+<!--                    <button type="button" class="add_answer">Add Answer</button>-->
+<!--                </div>-->
+<!--            `;-->
+<!--            document.getElementById('questions').appendChild(questionDiv);-->
+
+<!--            const answerDiv = document.createElement('div');-->
+<!--            answerDiv.innerHTML = `-->
+<!--                <label for="answer_${questionCount}_${answerCount}">Answer</label>-->
+<!--                <input type="text" name="answer_${questionCount}_${answerCount}" required>-->
+<!--                <label for="is_correct_${questionCount}_${answerCount}">Is Correct</label>-->
+<!--                <input type="checkbox" name="is_correct_${questionCount}_${answerCount}">-->
+<!--            `;-->
+<!--            document.getElementById(`answers_${questionCount}`).appendChild(answerDiv);-->
+
+<!--            answerCount++;-->
+
+<!--            questionDiv.querySelector('.add_answer').addEventListener('click', function () {-->
+<!--                const answerDiv = document.createElement('div');-->
+<!--                answerDiv.innerHTML = `-->
+<!--                    <label for="answer_${questionCount}_${answerCount}">Answer</label>-->
+<!--                    <input type="text" name="answer_${questionCount}_${answerCount}" required>-->
+<!--                    <label for="is_correct_${questionCount}_${answerCount}">Is Correct</label>-->
+<!--                    <input type="checkbox" name="is_correct_${questionCount}_${answerCount}">-->
+<!--                `;-->
+<!--                document.getElementById(`answers_${questionCount}`).appendChild(answerDiv);-->
+
+<!--                answerCount++;-->
+<!--            });-->
+
+<!--            questionCount++;-->
+<!--            document.querySelector('[name=total_questions]').value = questionCount;-->
+<!--        });-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Detail</title>
+</head>
+<body>
+    <h1>Quiz Detail</h1>
+    <p>Title: {{ quiz.title }}</p>
+    <p>Complexity: {{ quiz.complexity }}</p>
+    <p>Attempts: {{ quiz.attempts }}</p>
+    <p>Deadline: {{ quiz.deadline }} minutes</p>
+    <p>Success Criteria: {{ quiz.success_criteria }}</p>
+
+    <h2>Questions</h2>
+    <ul>
+        {% for question in questions %}
+            <li>{{ question.question_text }}</li>
+            <ul>
+                {% for choice in question.choice_set.all %}
+                    <li>{{ choice.choice_text }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
