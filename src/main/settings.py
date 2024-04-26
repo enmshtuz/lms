@@ -123,8 +123,16 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = 'code/static/'
 
-STATIC_ROOT = '/code/static/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Define the URL prefix for media files
+MEDIA_URL = '/media/'
+
+STATICFILES_DIRS = [
+    'src/apps/userAuth/static/userAuth/avatars/',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
