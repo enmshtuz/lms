@@ -1,0 +1,137 @@
+<!--<h2>Quiz List</h2>-->
+<!--<table>-->
+<!--  <thead>-->
+<!--    <tr>-->
+<!--      <th>Title</th>-->
+<!--      <th>Complexity</th>-->
+<!--      <th>Attempts</th>-->
+<!--      <th>Deadline (minutes)</th>-->
+<!--      <th>Success Criteria (%)</th>-->
+<!--      <th>Actions</th>-->
+<!--    </tr>-->
+<!--  </thead>-->
+<!--  <tbody>-->
+<!--    {% for quiz in quizzes %}-->
+<!--      <tr>-->
+<!--        <td><a href="{% url 'quiz_update' quiz.pk %}">{{ quiz.title }}</a></td>-->
+<!--        <td>{{ quiz.complexity }}</td>-->
+<!--        <td>{{ quiz.attempts }}</td>-->
+<!--        <td>{{ quiz.deadline }}</td>-->
+<!--        <td>{{ quiz.success_criteria }}</td>-->
+<!--        <td>-->
+<!--          <a href="{% url 'quiz_update' quiz.pk %}">Edit</a> |  &lt;!&ndash; Edit Link &ndash;&gt;-->
+<!--          <a href="{% url 'quiz_delete' quiz.pk %}">Delete</a>  &lt;!&ndash; Delete Link &ndash;&gt;-->
+<!--        </td>-->
+<!--      </tr>-->
+<!--    {% endfor %}-->
+<!--  </tbody>-->
+<!--</table>-->
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Quiz List</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h1>All Quizzes</h1>-->
+<!--    <ul>-->
+<!--        {% for quiz in page_obj %}-->
+<!--            <li>{{ quiz.title }}</li> &lt;!&ndash; Adjust this to display quiz details &ndash;&gt;-->
+<!--        {% endfor %}-->
+<!--    </ul>-->
+
+<!--    {% if page_obj.has_other_pages %}-->
+<!--        <div class="pagination">-->
+<!--            <span class="step-links">-->
+<!--                {% if page_obj.has_previous %}-->
+<!--                    <a href="?page=1">&laquo; first</a>-->
+<!--                    <a href="?page={{ page_obj.previous_page_number }}">previous</a>-->
+<!--                {% endif %}-->
+
+<!--                <span class="current">-->
+<!--                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.-->
+<!--                </span>-->
+
+<!--                {% if page_obj.has_next %}-->
+<!--                    <a href="?page={{ page_obj.next_page_number }}">next</a>-->
+<!--                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>-->
+<!--                {% endif %}-->
+<!--            </span>-->
+<!--        </div>-->
+<!--    {% endif %}-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz List</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>All quizzes</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Complexity</th>
+                <th>Attempts</th>
+                <th>Deadline</th>
+                <th>Success Criteria</th>
+                <!-- Add more table headers for other quiz details if needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for quiz in page_obj %}
+                <tr>
+                    <td>{{ quiz.title }}</td>
+                    <td>{{ quiz.complexity }}</td>
+                    <td>{{ quiz.attempts }}</td>
+                    <td>{{ quiz.deadline }}</td>
+                    <td>{{ quiz.success_criteria }}</td>
+                    <!-- Add more table cells for other quiz details if needed -->
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+</body>
+</html>

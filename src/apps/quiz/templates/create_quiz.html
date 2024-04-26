@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz</title>
+    <style>
+        /* Add styles from register.html here */
+
+        /* Style for the form */
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style for the heading */
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Style for labels */
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        /* Style for input fields */
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Style for buttons */
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Style for answer section */
+        .answers {
+            margin-top: 10px;
+        }
+
+        /* Style for add answer button */
+        .add_answer {
+            padding: 5px 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add_answer:hover {
+            background-color: #218838;
+        }
+    </style>
+
+</head>
+<body>
+    <h1>Create Quiz</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ quiz_form.as_p }}
+
+        <div id="questions">
+            <button type="button" id="add_question">Add Question</button>
+        </div>
+
+        <button type="submit">Save</button>
+    </form>
+
+    <script>
+        let questionCount = 0;
+        let answerCount = 0;
+
+        document.getElementById('add_question').addEventListener('click', function () {
+            const questionDiv = document.createElement('div');
+            questionDiv.innerHTML = `
+                <label for="question_${questionCount}">Question</label>
+                <input type="text" name="question_${questionCount}" required>
+                <label for="question_type_${questionCount}">Question Type</label>
+                <select name="question_type_${questionCount}" required>
+                    <option value="radio">Radio</option>
+                    <option value="checkbox">Checkbox</option>
+                </select>
+                <div class="answers" id="answers_${questionCount}">
+                    <button type="button" class="add_answer">Add Answer</button>
+                </div>
+            `;
+            document.getElementById('questions').appendChild(questionDiv);
+
+            const answerDiv = document.createElement('div');
+            answerDiv.innerHTML = `
+                <label for="answer_${questionCount}_${answerCount}">Answer</label>
+                <input type="text" name="answer_${questionCount}_${answerCount}" required>
+                <label for="is_correct_${questionCount}_${answerCount}">Is Correct</label>
+                <input type="checkbox" name="is_correct_${questionCount}_${answerCount}">
+            `;
+            document.getElementById(`answers_${questionCount}`).appendChild(answerDiv);
+
+            answerCount++;
+
+            questionDiv.querySelector('.add_answer').addEventListener('click', function () {
+                const answerDiv = document.createElement('div');
+                answerDiv.innerHTML = `
+                    <label for="answer_${questionCount}_${answerCount}">Answer</label>
+                    <input type="text" name="answer_${questionCount}_${answerCount}" required>
+                    <label for="is_correct_${questionCount}_${answerCount}">Is Correct</label>
+                    <input type="checkbox" name="is_correct_${questionCount}_${answerCount}">
+                `;
+                document.getElementById(`answers_${questionCount}`).appendChild(answerDiv);
+
+                answerCount++;
+            });
+
+            questionCount++;
+            document.querySelector('[name=total_questions]').value = questionCount;
+        });
+    </script>
+</body>
+</html>
