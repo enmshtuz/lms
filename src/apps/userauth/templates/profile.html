@@ -1,0 +1,63 @@
+{% extends 'layouts/base-fullscreen.html' %}
+{% load i18n static admin_soft %}
+
+{% block content %}
+<main class="main-content mt-0">
+    <section>
+        <div class="page-header min-vh-75">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-4 col-lg-5 col-md-6 d-flex flex-column mx-auto">
+                        <div class="card card-plain mt-8">
+                            <div class="card-header pb-0 text-left bg-transparent">
+                                <h3 class="font-weight-bolder text-info text-gradient">
+                                    Your Profile
+                                </h3>
+                                <p class="mb-0">
+                                    View and edit your profile information
+                                </p>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {% if profile.avatar %}
+                                        <img src="{{ profile.avatar.url }}" alt="User Avatar"
+                                            class="img-fluid rounded-circle" style="width: 150px; height: 150px;">
+                                    {% else %}
+                                        <img src="{% static 'profile_pic.png' %}" alt="Default Profile"
+                                            class="img-fluid rounded-circle" style="width: 150px; height: 150px;">
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Name:</strong> {{ profile.first_name }}
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Last Name:</strong> {{ profile.last_name }}
+                                </div>
+                                {% if profile.date_of_birth %}
+                                    <div class="mb-3">
+                                        <strong>Date of Birth:</strong> {{ profile.date_of_birth }}
+                                    </div>
+                                {% endif %}
+                                {% if request.user.is_staff %}
+                                    <a href="{% url 'site_settings' %}" class="btn btn-primary">Settings</a>
+                                {% endif %}
+
+                                <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="oblique position-absolute top-0 h-100 d-md-block d-none me-n8">
+                            <div class="oblique-image bg-cover position-absolute fixed-top ms-auto h-100 z-index-0 ms-n6"
+                                style="background-image:url('{% static 'img/curved-images/curved6.jpg' %}')"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% include 'footer-fullscreen.html' %}
+
+{% endblock content %}
