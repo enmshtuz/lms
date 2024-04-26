@@ -1,0 +1,196 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Update Quiz</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h1>Update Quiz</h1>-->
+<!--    <form method="POST">-->
+<!--        {% csrf_token %}-->
+<!--        {{ form.as_p }}-->
+
+<!--        &lt;!&ndash; Add fields for questions and answers &ndash;&gt;-->
+<!--        <h2>Questions</h2>-->
+<!--        <input type="hidden" name="total_questions" value="{{ quiz.questions.count }}">-->
+<!--        {% for question in quiz.questions.all %}-->
+<!--            <div>-->
+<!--                <label for="question_{{ forloop.counter0 }}">Question {{ forloop.counter }}:</label>-->
+<!--                <input type="text" id="question_{{ forloop.counter0 }}" name="question_{{ forloop.counter0 }}" value="{{ question.text }}">-->
+<!--                <input type="hidden" name="question_type_{{ forloop.counter0 }}" value="{{ question.question_type }}">-->
+<!--                <input type="hidden" name="total_answers_{{ forloop.counter0 }}" value="{{ question.answers.count }}">-->
+<!--                <h3>Answers</h3>-->
+<!--                {% for answer in question.answers.all %}-->
+<!--                    <div>-->
+<!--                        <input type="text" name="answer_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}" value="{{ answer.text }}">-->
+<!--                        <input type="checkbox" name="is_correct_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}" {% if answer.is_correct %}checked{% endif %}>-->
+<!--                    </div>-->
+<!--                {% endfor %}-->
+<!--            </div>-->
+<!--        {% endfor %}-->
+
+<!--        <button type="submit">Update</button>-->
+<!--    </form>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Quiz</title>
+    <style>
+        /* CSS styles here */
+        /* Style for the form */
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style for the heading */
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Style for labels */
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        /* Style for input fields */
+        input[type="text"],
+        input[type="checkbox"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Style for buttons */
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Style for each question container */
+        div.question-container {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+
+        /* Style for answer input fields */
+        div.question-container input[type="text"] {
+            margin-left: 20px;
+        }
+
+        /* Style for answer checkbox */
+        div.question-container input[type="checkbox"] {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Update Quiz</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <!-- Add fields for questions and answers -->
+        <h2>Questions</h2>
+        <input type="hidden" name="total_questions" value="{{ quiz.questions.count }}">
+        {% for question in quiz.questions.all %}
+            <div class="question-container">
+                <label for="question_{{ forloop.counter0 }}">Question {{ forloop.counter }}:</label>
+                <input type="text" id="question_{{ forloop.counter0 }}" name="question_{{ forloop.counter0 }}" value="{{ question.text }}">
+                <input type="hidden" name="question_type_{{ forloop.counter0 }}" value="{{ question.question_type }}">
+                <input type="hidden" name="total_answers_{{ forloop.counter0 }}" value="{{ question.answers.count }}">
+                <h3>Answers</h3>
+                {% for answer in question.answers.all %}
+                    <div>
+                        <input type="text" name="answer_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}" value="{{ answer.text }}">
+                        <input type="checkbox" name="is_correct_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}" {% if answer.is_correct %}checked{% endif %}>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <!-- Add JavaScript for adding questions and answers -->
+        <div id="questions">
+            <button type="button" id="add_question">Add Question</button>
+        </div>
+
+        <button type="submit">Update</button>
+    </form>
+
+    <script>
+        let questionCount = {{ quiz.questions.count }};
+        let answerCount = 0;
+
+        document.getElementById('add_question').addEventListener('click', function () {
+            const questionDiv = document.createElement('div');
+            questionDiv.innerHTML = `
+                <label for="question_${questionCount}">Question</label>
+                <input type="text" name="question_${questionCount}" required>
+                <label for="question_type_${questionCount}">Question Type</label>
+                <select name="question_type_${questionCount}" required>
+                    <option value="radio">Radio</option>
+                    <option value="checkbox">Checkbox</option>
+                </select>
+                <div class="answers" id="answers_${questionCount}">
+                    <button type="button" class="add_answer">Add Answer</button>
+                </div>
+            `;
+            document.getElementById('questions').appendChild(questionDiv);
+
+            const answerDiv = document.createElement('div');
+            answerDiv.innerHTML = `
+                <label for="answer_${questionCount}_${answerCount}">Answer</label>
+                <input type="text" name="answer_${questionCount}_${answerCount}" required>
+                <label for="is_correct_${questionCount}_${answerCount}">Is Correct</label>
+                <input type="checkbox" name="is_correct_${questionCount}_${answerCount}">
+            `;
+            document.getElementById(`answers_${questionCount}`).appendChild(answerDiv);
+
+            answerCount++;
+
+            questionDiv.querySelector('.add_answer').addEventListener('click', function () {
+                const answerDiv = document.createElement('div');
+                answerDiv.innerHTML = `
+                    <label for="answer_${questionCount}_${answerCount}">Answer</label>
+                    <input type="text" name="answer_${questionCount}_${answerCount}" required>
+                    <label for="is_correct_${questionCount}_${answerCount}">Is Correct</label>
+                    <input type="checkbox" name="is_correct_${questionCount}_${answerCount}">
+                `;
+                document.getElementById(`answers_${questionCount}`).appendChild(answerDiv);
+
+                answerCount++;
+            });
+
+            questionCount++;
+            document.querySelector('[name=total_questions]').value = questionCount;
+        });
+    </script>
+</body>
+</html>
