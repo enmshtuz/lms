@@ -1,6 +1,8 @@
+from django.contrib.auth import password_validation
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from .models import Profile, User
+from .models import Profile, User, EmailVerification
 from django import forms
 
 class RegistrationForm(UserCreationForm):
@@ -89,27 +91,44 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['first_name', 'last_name', 'date_of_birth', 'avatar']
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'})
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Set first name and last name fields as required
-        self.fields['first_name'].required = True
-        self.fields['last_name'].required = True
-        self.fields['date_of_birth'].required = False
-
 
 class ForgotPasswordForm(forms.Form):
-    email = forms.EmailField()
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'placeholder': 'Enter your email'}))
+
+    def clean_email(self):
+
+        email = self.cleaned_data.get('email')
+        if not User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email address is not associated with any user.")
+        else:
+            user = User.objects.get(email=email)
+            verification = EmailVerification.objects.filter(user=user).first()
+            if verification.token is not None:
+                raise forms.ValidationError("Your email is not verified.")
+
+        return email
+
 
 class UserSetPasswordForm(forms.Form):
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(
+        label=_("Password"),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
+    )
+    confirm_password = forms.CharField(
+        label=_("Password Confirmation"),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password Confirmation'}),
+    )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        confirm_password = cleaned_data.get("confirm_password")
-
-        if password != confirm_password:
+    def clean_confirm_password(self):
+        password = self.cleaned_data.get("password")
+        confirm_password = self.cleaned_data.get("confirm_password")
+        if password and confirm_password and password != confirm_password:
             raise forms.ValidationError("Passwords do not match.")
-        return cleaned_data
+        return confirm_password

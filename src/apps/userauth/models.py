@@ -10,9 +10,22 @@ class EmailVerification(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     token = models.UUIDField(default=uuid.uuid4, editable=False, null=True)
     created_at = models.DateTimeField(default=timezone.now, null=True)
+    is_opened = models.BooleanField(default=False)
+
 
     def __str__(self):
         return f"Verification token for {self.user.username}"
+
+
+class PasswordReset(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid.uuid4, editable=False, null=True)
+    created_at = models.DateTimeField(default=timezone.now, null=True)
+    is_opened = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return f"Password reset token for {self.user.email}"
 
 
 class Profile(models.Model):
@@ -25,6 +38,7 @@ class Profile(models.Model):
     def __str__(self):
         return f'Profile of {self.user.username}'
 
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created and not hasattr(instance, 'profile'):
@@ -32,6 +46,7 @@ def create_user_profile(sender, instance, created, **kwargs):
         profile.first_name = instance.first_name
         profile.last_name = instance.last_name
         profile.save()
+
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):

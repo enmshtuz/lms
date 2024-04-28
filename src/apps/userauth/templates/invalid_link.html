@@ -14,25 +14,8 @@
                             <div class="card card-plain mt-8">
                                 <div class="card-header pb-0 text-left bg-transparent">
                                     <h3 class="font-weight-bolder text-info text-gradient">
-                                        Verification Link Expired
+                                        Invalid Link
                                     </h3>
-                                </div>
-                                <div class="card-body">
-                                    The verification link is no longer valid. Please enter your email below to resend
-                                    the verification email.
-                                    <form role="form" method="post" action="#">
-                                        {% csrf_token %}
-                                        {% for field in form %}
-                                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                            <div class="mb-3">
-                                                {{ field }}
-                                            </div>
-                                            <span class="text-danger">{{ field.errors }}</span>
-                                        {% endfor %}
-                                        <button type="submit" class="btn btn-primary" name="resend_verification_email">
-                                            Resend verification email
-                                        </button>
-                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +30,5 @@
             </div>
         </section>
     </main>
-
-
 
 {% endblock content %}
