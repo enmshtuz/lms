@@ -23,10 +23,10 @@ COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-## Copy entrypoint.sh and make it executable
-#COPY ./entrypoint.sh /code/entrypoint.sh
-#RUN sed -i 's/\r$//g' $APP_HOME/entrypoint.sh
-#RUN chmod +x /code/entrypoint.sh
-#
-## Run entrypoint.sh
-#ENTRYPOINT ["/code/entrypoint.sh"]
+# Copy entrypoint.sh and make it executable
+COPY ./entrypoint.sh /code/entrypoint.sh
+RUN sed -i 's/\r$//g' $APP_HOME/entrypoint.sh
+RUN chmod +x /code/entrypoint.sh
+
+# Run entrypoint.sh
+ENTRYPOINT ["/code/entrypoint.sh"]
