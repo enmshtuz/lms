@@ -75,6 +75,9 @@ def invalid_link(request):
 def verify_email(request, token, uid):
     verification = EmailVerification.objects.filter(token=token).first()
     if verification:
+        # site_settings = SiteSettings.objects.first()
+        # verification_link_expiration_microseconds = site_settings.verification_link_expiration.total_microseconds()
+        # verification_link_expiration_hours = int(verification_link_expiration_microseconds / 3600000000)
         if timezone.now() - verification.created_at <= timezone.timedelta(hours=5):
             verification.user.is_active = True
             verification.user.save()
@@ -193,9 +196,9 @@ def site_settings(request):
     if request.method == 'POST':
         site_settings_instance.open_registration = bool(request.POST.get('open_registration'))
         site_settings_instance.invitation_link_expiration = timezone.timedelta(
-            days=int(request.POST.get('invitation_link_expiration_days')))
+            days=float(request.POST.get('invitation_link_expiration_days')))
         site_settings_instance.verification_link_expiration = timezone.timedelta(
-            hours=int(request.POST.get('verification_link_expiration_hours')))
+            hours=float(request.POST.get('verification_link_expiration_hours')))
         site_settings_instance.save()
 
         messages.success(request, 'Settings saved successfully.')
