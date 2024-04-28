@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'src.apps.userAuth.apps.UserAuthConfig',
+    'src.apps.courses.apps.CoursesConfig'
 ]
 
 MIDDLEWARE = [
@@ -110,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Yerevan'
 
 USE_I18N = True
 
@@ -131,7 +132,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = [
-    # 'src/apps/userAuth/static/userAuth/avatars/',
+    os.path.join(BASE_DIR, 'courses', 'static'),
+    os.path.join(BASE_DIR, "course_videos"),
+    os.path.join(BASE_DIR, "course_files"),
+    # 'src/apps/userAuth/static/userAuth/avatars/'
 ]
 
 # Default primary key field type
