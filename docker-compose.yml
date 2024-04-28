@@ -8,7 +8,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: gunicorn --bind 0.0.0.0:8000 src.main.wsgi:application --workers 3 --reload
+    command: gunicorn --bind 0.0.0.0:8000 src.main.wsgi:application --workers 3 --reload --timeout 60
     ports:
       - "8000:8000"
     volumes:

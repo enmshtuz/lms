@@ -78,7 +78,7 @@ def verify_email(request, token, uid):
         # site_settings = SiteSettings.objects.first()
         # verification_link_expiration_microseconds = site_settings.verification_link_expiration.total_microseconds()
         # verification_link_expiration_hours = int(verification_link_expiration_microseconds / 3600000000)
-        if timezone.now() - verification.created_at <= timezone.timedelta(hours=5):
+        if timezone.now() - verification.created_at <= timezone.timedelta(hours=6):
             verification.user.is_active = True
             verification.user.save()
             verification.token = None
