@@ -6,36 +6,44 @@
 <div class="card">
         <div class="card-body pt-4 p-3">
           <ul class="list-group">
-              {% for course in page_obj %}
-                  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
-                      <div class="d-flex flex-column">
-                          {% if course.url %}
-                           <a target="_blank" href="{{course.url}}" class="mb-3 text-sm">{{ course.title }}</a>
-                          {% elif course.video %}
-                           <a target="_blank" href="/courses/{{ course.pk }}/details/" class="mb-3 text-sm">{{ course.title }}</a>
-                          {% elif course.file %}
-                           <a href="{{ course.file}}" class="mb-3 text-sm" download>{{ course.title }}</a>
-                          {% endif %}
-                        <span class="mb-2 text-xs">Course Description:<span class="text-dark font-weight-bold ms-sm-2">{{ course.description }}</span></span>
-                        <span class="mb-2 text-xs">Course Level:<span class="text-dark ms-sm-2 font-weight-bold">{{ course.level }}</span></span>
-                        <span class="mb-2 text-xs">Published Date:<span class="text-dark ms-sm-2 font-weight-bold">{{ course.publish_date }}</span></span>
-                        <span class="mb-2 text-xs">People Enrolled:<span class="text-dark ms-sm-2 font-weight-bold">{{ course.enrolled_users_count }}</span></span>
-                      </div>
-                      <div class="ms-auto text-end">
-                          {% if course.is_published %}
-                            {% if request.user.is_authenticated %}
-                              {% if request.user not in course.enrolled_users.all %}
-                                  <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="{% url 'enroll_course' course.pk %}"><i class="far fa-trash-alt me-2"></i>Enroll</a>
-                              {% else %}
-                                  <a class="btn btn-link text-dark px-3 mb-0" href="{% url 'unenroll_course' course.pk %}"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Unenroll</a>
-                              {% endif %}
-                            {% else %}
-                              <a href="{% url 'login' %}">Login to Enroll</a>
+                {% for course in page_obj %}
+                    <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                        <div class="d-flex flex-column">
+                            <!-- {% if course.url %}
+                                <a target="_blank" href="{{ course.url }}" class="mb-3 text-sm">{{ course.title }}</a>
+                            {% elif course.video %}
+                                <a target="_blank" href="/courses/{{ course.pk }}/details/" class="mb-3 text-sm">{{ course.title }}</a>
+                            {% elif course.file %}
+                                <a href="{{ course.file }}" class="mb-3 text-sm" download>{{ course.title }}</a>
+                            {% endif %} -->
+                            <span target="_blank" class="mb-3 text-sm">{{ course.title }}</span>
+
+                            <span class="mb-2 text-xs">Course Description:<span class="text-dark font-weight-bold ms-sm-2">{{ course.description }}</span></span>
+                            <span class="mb-2 text-xs">Course Level:<span class="text-dark ms-sm-2 font-weight-bold">{{ course.level }}</span></span>
+                            <span class="mb-2 text-xs">Published Date:<span class="text-dark ms-sm-2 font-weight-bold">{{ course.publish_date }}</span></span>
+                            <span class="mb-2 text-xs">People Enrolled:<span class="text-dark ms-sm-2 font-weight-bold">{{ course.enrolled_count }}</span></span>
+                        </div>
+                        <div class="ms-auto text-end">
+                            {% if course.is_published %}
+                                {% if request.user.is_authenticated %}
+                                    {% if course.is_enrolled and not course.is_forced_enrolled%}
+                                        <form method="post" action="{% url 'unenroll_course' course.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-link text-dark px-3 mb-0"><i class="fa fa-user-times text-dark me-2" aria-hidden="true"></i>Unenroll</button>
+                                          </form>
+                                    {% else %}
+                                        <form method="post" action="{% url 'enroll_course' course.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-link text-dark text-gradient px-3 mb-0"><i class="fa fa-user-plus text-dark me-2"></i>Enroll</button>
+                                        </form>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{% url 'login' %}">Login to Enroll</a>
+                                {% endif %}
                             {% endif %}
-                          {% endif %}
-                      </div>
-                  </li>
-              {% endfor %}
+                        </div>
+                    </li>
+                {% endfor %}
           </ul>
         </div>
 </div>
@@ -45,7 +53,7 @@
 {% if page_obj.has_next %}
   <a href="?page={{ page_obj.next_page_number }}">Next</a>
 {% endif %}
-
+    
 <!-- Pagination -->
 <nav aria-label="Page navigation">
   <ul class="pagination justify-content-center">

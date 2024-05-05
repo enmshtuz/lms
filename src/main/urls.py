@@ -6,9 +6,11 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('admin_soft.urls')),
+    path('quiz/', include('src.apps.quiz.urls')),
     path('account/', include('src.apps.userAuth.urls')),
     path('courses/', include('src.apps.courses.urls'))
 ]
+
 
 # + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.DEBUG:

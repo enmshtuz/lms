@@ -1,0 +1,86 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Available Quizzes</h2>
+<div class="card">
+    <div class="card-body pt-4 p-3">
+        <ul class="list-group">
+            {% for quiz in page_obj %}
+            <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                <div class="d-flex flex-column">
+                    {% if quiz.url %}
+                    <a class="mb-3 text-sm" href="{{quiz.url}}" target="_blank">{{ quiz.title }}</a>
+                    <!--                          {% elif course.video %}-->
+                    <!--                           <a target="_blank" href="/courses/{{ course.pk }}/details/" class="mb-3 text-sm">{{ course.title }}</a>-->
+                    <!--                          {% elif course.file %}-->
+                    <!--                           <a href="{{ course.file}}" class="mb-3 text-sm" download>{{ course.title }}</a>-->
+                    {% endif %}
+                    <span class="mb-2 text-xs">Quiz Title:<span class="text-dark font-weight-bold ms-sm-2">{{ quiz.title }}</span></span>
+                    <span class="mb-2 text-xs">Quiz Complexity:<span class="text-dark font-weight-bold ms-sm-2">{{ quiz.complexity }}</span></span>
+                    <span class="mb-2 text-xs">Quiz Attempts:<span class="text-dark ms-sm-2 font-weight-bold">{{ quiz.attempts }}</span></span>
+                    <span class="mb-2 text-xs">Quiz Deadline:<span class="text-dark ms-sm-2 font-weight-bold">{{ quiz.deadline}}</span></span>
+                    <span class="mb-2 text-xs">Quiz Success_Criteria:<span class="text-dark ms-sm-2 font-weight-bold">{{ quiz.success_criteria }}</span></span>
+                </div>
+                <div class="ms-auto text-end">
+                    {% if course.is_published %}
+                    {% if request.user.is_authenticated %}
+                    {% if request.user not in course.enrolled_users.all %}
+                    <a class="btn btn-link text-danger text-gradient px-3 mb-0"
+                       href="{% url 'enroll_course' course.pk %}"><i class="far fa-trash-alt me-2"></i>Enroll</a>
+                    {% else %}
+                    <a class="btn btn-link text-dark px-3 mb-0" href="{% url 'unenroll_course' course.pk %}"><i
+                            aria-hidden="true" class="fas fa-pencil-alt text-dark me-2"></i>Unenroll</a>
+                    {% endif %}
+                    {% else %}
+                    <a href="{% url 'login' %}">Login to Enroll</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% if page_obj.has_previous %}
+<a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+{% endif %}
+{% if page_obj.has_next %}
+<a href="?page={{ page_obj.next_page_number }}">Next</a>
+{% endif %}
+
+<!-- Pagination -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a aria-label="First" class="page-link" href="?page=1">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a aria-label="Previous" class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a aria-label="Next" class="page-link" href="?page={{ page_obj.next_page_number }}">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a aria-label="Last" class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endblock content %}

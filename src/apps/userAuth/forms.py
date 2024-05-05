@@ -1,9 +1,8 @@
-from django.contrib.auth import password_validation
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
-from .models import Profile, User, EmailVerification
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.utils.translation import gettext_lazy as _
+from .models import EmailVerification, InvitationLink, Profile, User
+
 
 class RegistrationForm(UserCreationForm):
     password1 = forms.CharField(
@@ -48,6 +47,53 @@ class RegistrationForm(UserCreationForm):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("This email address is already in use.")
+        return email
+
+
+class ClosedRegistrationForm(UserCreationForm):
+    password1 = forms.CharField(
+        label=_("Password"),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
+    )
+    password2 = forms.CharField(
+        label=_("Password Confirmation"),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password Confirmation'}),
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email',)
+
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Username'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Email'
+            }),
+            'first_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'pattern': '^[a-zA-Z]+',
+                'required': 'required',
+                'title': 'Only letters are allowed.',
+                'placeholder': 'First Name'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'pattern': '^[a-zA-Z]+',
+                'required': 'required',
+                'title': 'Only letters are allowed.',
+                'placeholder': 'Last Name'
+            })
+        }
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        invitation_link = InvitationLink.objects.filter(email=email).first()
+        if not invitation_link:
+            raise forms.ValidationError("Please enter the email you received the invitation link on.")
         return email
 
 
@@ -98,6 +144,7 @@ class ProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+
 class ForgotPasswordForm(forms.Form):
     email = forms.EmailField(label='Email', widget=forms.EmailInput(
         attrs={'class': 'form-control', 'placeholder': 'Enter your email'}))
@@ -132,3 +179,14 @@ class UserSetPasswordForm(forms.Form):
         if password and confirm_password and password != confirm_password:
             raise forms.ValidationError("Passwords do not match.")
         return confirm_password
+
+
+class InvitationEmailForm(forms.Form):
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(
+        attrs={'class': 'form-control'}))
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email is already registered.")
+        return email
