@@ -20,18 +20,23 @@
                             <div class="mb-3">
                                 <label for="invitation_link_expiration_days" class="form-label">Invitation Link
                                     Expiration (Days)</label>
-                                <input type="number" step="0.01" class="form-control"
-                                       id="invitation_link_expiration_days" name="invitation_link_expiration_days"
-                                       value="{{ site_settings.invitation_link_expiration }}">
+                                <input type="number" class="form-control" id="invitation_link_expiration_days"
+                                       placeholder="Invitation Link Expiration Days"
+                                       name="invitation_link_expiration_days"
+                                       required
+                                       value="{{ site_settings.invitation_link_expiration_days|stringformat:"d" }}"
+                                       step="1">
                             </div>
                             <div class="mb-3">
                                 <label for="verification_link_expiration_hours" class="form-label">Verification Link
                                     Expiration (Hours)</label>
-                                <input type="number" step="0.01" class="form-control"
-                                       id="verification_link_expiration_hours" name="verification_link_expiration_hours"
-                                       value="{{ site_settings.verification_link_expiration }}">
+                                <input type="number" class="form-control" id="verification_link_expiration_hours"
+                                       placeholder="Verification Link Expiration Hours"
+                                       name="verification_link_expiration_hours"
+                                       required
+                                       value="{{ site_settings.verification_link_expiration_hours|stringformat:"d" }}"
+                                       step="1">
                             </div>
-
                             <button type="submit" class="btn btn-primary">Save</button>
                             <a href="{% url 'profile' %}" class="btn btn-secondary">Cancel</a>
                         </form>
