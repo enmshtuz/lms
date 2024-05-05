@@ -28,3 +28,12 @@ class CourseForm(forms.ModelForm):
             raise forms.ValidationError('Please choose only one of file, video, or URL.')
 
         return cleaned_data
+
+
+# class CourseEnrollmentForm(forms.ModelForm):
+#     class Meta:
+#         model = CourseEnrollment
+#         fields = ['course', 'user', 'enrollment_type']
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)

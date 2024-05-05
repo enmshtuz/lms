@@ -22,7 +22,8 @@
                   <p>Are you sure you want to {% if course.is_published %}unpublish{% else %}publish{% endif %} "{{ course.title }}"?</p>
                   <form method="post">
                       {% csrf_token %}
-                      <button type="submit">Confirm</button>
+                      <button type="submit" class="btn bg-gradient-info w-100 mt-4 mb-0">Confirm</button>
+                      <a href="{% url 'course_list' %}" class='btn bg-gradient-info w-100 mt-4 mb-0'>Cancel</a>
                   </form>
                 </div>
               </div>
@@ -41,3 +42,5 @@
   {% include 'includes/footer-fullscreen.html' %}
 
 {% endblock content %}
+
+
