@@ -1,0 +1,59 @@
+<!-- quiz_detail.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ quiz.title }}</title>
+</head>
+<body>
+    <h1>{{ quiz.title }}</h1>
+    <p>{{ quiz.description }}</p>
+
+    <!-- Display the remaining time -->
+    {% if quiz.deadline_minutes %}
+        <p>Remaining Time: <span id="timer"></span></p>
+    {% endif %}
+
+    <form id="quizForm" method="post">
+        {% csrf_token %}
+        <!-- Render quiz questions and answer options here -->
+        {% for question in quiz.questions.all %}
+            <h2>{{ question.text }}</h2>
+            {% for answer in question.answers.all %}
+                <input type="button" name="answer_{{ question.id }}" value="{{ answer.id }}">
+                <label for="answer_{{ question.id }}">{{ answer.text }}</label><br>
+            {% endfor %}
+        {% endfor %}
+
+        <!-- Render attempt form here -->
+        {{ form.as_p }}
+
+        <!-- Disable submit button if the deadline has passed -->
+        {% if quiz.deadline_minutes %}
+            <script>
+                var deadline = new Date('{{ quiz.publish_date|date:"Y-m-d H:i:s" }}');
+                deadline.setMinutes(deadline.getMinutes() + {{ quiz.deadline_minutes }});
+
+                var x = setInterval(function() {
+                    var now = new Date().getTime();
+                    var distance = deadline - now;
+
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    document.getElementById("timer").innerHTML = minutes + "m " + seconds + "s ";
+
+                    if (distance < 0) {
+                        clearInterval(x);
+                        document.getElementById("timer").innerHTML = "Time's up!";
+                        document.getElementById("submitBtn").disabled = true; // Disable submit button
+                    }
+                }, 1000);
+            </script>
+        {% endif %}
+
+        <input type="submit" value="Submit Quiz" id="submitBtn">
+    </form>
+</body>
+</html>
