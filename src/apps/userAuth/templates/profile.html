@@ -2,6 +2,7 @@
 {% load i18n static admin_soft %}
 
 {% block content %}
+    {% include 'sidebar.html' %}
     <main class="main-content mt-0">
         <section>
             <div class="page-header min-vh-75">
@@ -42,7 +43,12 @@
                                         <a href="{% url 'site_settings' %}" class="btn btn-primary">Settings</a>
                                     {% endif %}
                                     {% if request.user.is_staff %}
-                                        <a href="{% url 'send_invitation_email' %}" class="btn btn-primary">Send Invitation</a>
+                                        <a href="{% url 'register_invitation' %}" class="btn btn-primary">Send
+                                            Invitation</a>
+                                    {% endif %}
+                                    {% if request.user.is_staff %}
+                                        <a href="{% url 'manage_roles' %}" class="btn btn-primary">Manage
+                                            Roles</a>
                                     {% endif %}
                                     <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
                                 </div>
@@ -59,7 +65,4 @@
             </div>
         </section>
     </main>
-
-    {% include 'footer-fullscreen.html' %}
-
 {% endblock content %}
