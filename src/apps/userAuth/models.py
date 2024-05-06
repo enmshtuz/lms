@@ -5,7 +5,6 @@ from django.dispatch import receiver
 from django.utils import timezone
 import uuid
 
-
 class EmailVerification(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     token = models.UUIDField(default=uuid.uuid4, editable=False, null=True)
@@ -35,7 +34,6 @@ class Profile(models.Model):
     def __str__(self):
         return f'Profile of {self.user.username}'
 
-
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created and not hasattr(instance, 'profile'):
@@ -43,7 +41,6 @@ def create_user_profile(sender, instance, created, **kwargs):
         profile.first_name = instance.first_name
         profile.last_name = instance.last_name
         profile.save()
-
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
@@ -80,15 +77,28 @@ class InvitationLink(models.Model):
         super().save(*args, **kwargs)
 
 
-class Role:
-    USER = 'User'
-    MANAGER = 'Manager'
-    ADMIN = 'Admin'
+# class Role:
+#     USER = 'User'
+#     MANAGER = 'Manager'
+#     ADMIN = 'Admin'
+#
+#     @classmethod
+#     def choices(cls):
+#         return (
+#             (cls.USER, 'User'),
+#             (cls.MANAGER, 'Manager'),
+#             (cls.ADMIN, 'Admin'),
+#         )
 
-    @classmethod
-    def choices(cls):
-        return (
-            (cls.USER, 'User'),
-            (cls.MANAGER, 'Manager'),
-            (cls.ADMIN, 'Admin'),
-        )
+
+class UserRoles(models.Model):
+    ROLE_CHOICES = (
+        ('user', 'User'),
+        ('manager', 'Manager'),
+        ('admin', 'Admin'),
+    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+
+    def __str__(self):
+        return f"{self.user.username}'s role: {self.role}"
