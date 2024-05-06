@@ -38,10 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'src.apps.quiz.apps.QuizConfig',
     'src.apps.userAuth.apps.UserAuthConfig',
     'src.apps.courses.apps.CoursesConfig',
-
+    'src.apps.quiz.apps.QuizConfig',
 ]
 
 MIDDLEWARE = [
@@ -59,6 +58,9 @@ ROOT_URLCONF = 'src.main.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),
+                 'code/static'
+                 ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,19 +132,17 @@ STATIC_ROOT = 'code/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
-STATIC_ROOT = '/code/static/'
-
 # Define the URL prefix for media files
 MEDIA_URL = '/media/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'courses', 'static'),
-    os.path.join(BASE_DIR, "course_videos"),
-    os.path.join(BASE_DIR, "course_files"),
-    # 'src/apps/userAuth/static/userAuth/avatars/'
-]
 
+STATICFILES_DIRS = [
+    # os.path.join(BASE_DIR, 'courses', 'static'),
+    # os.path.join(BASE_DIR, "course_videos"),
+    # os.path.join(BASE_DIR, "course_files"),
+    'src/apps/userAuth/static/userAuth/avatars/',
+    'src/media/',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
