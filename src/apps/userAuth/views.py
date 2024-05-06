@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.core.mail import send_mail
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -15,7 +15,8 @@ from django.views.generic import View
 from django.views.generic.edit import FormView
 from .forms import RegistrationForm, ResendVerificationEmailForm, LoginForm, ProfileForm, ForgotPasswordForm, \
     UserSetPasswordForm, InvitationEmailForm, ClosedRegistrationForm
-from .models import EmailVerification, Profile, SiteSettings, User, PasswordReset, InvitationLink
+from .models import EmailVerification, Profile, SiteSettings, User, PasswordReset, InvitationLink, UserRoles
+import os
 import uuid
 
 UserModel = get_user_model()
@@ -29,6 +30,8 @@ def register(request):
                 user = form.save()
                 user.set_password(form.cleaned_data['password1'])
                 user.save()
+
+                UserRoles.objects.create(user=user, role='user')
 
                 token = generate_verification_token()
                 verification = EmailVerification.objects.create(user=user, token=token)
@@ -69,6 +72,8 @@ def closed_register(request, uid, token):
                 user.set_password(form.cleaned_data['password1'])
                 user.save()
 
+                UserRoles.objects.create(user=user, role='user')
+
                 verify_token = generate_verification_token()
                 verification = EmailVerification.objects.create(user=user, token=verify_token)
                 verification.save()
@@ -96,7 +101,7 @@ def update_expired_links_status():
     site_settings = SiteSettings.objects.first()
     link_expiration = site_settings.invitation_link_expiration_days
     expired_links = InvitationLink.objects.filter(
-        created_at__lte=timezone.now() - timezone.timedelta(days=link_expiration),
+        created_at__lte=timezone.now() - timezone.timedelta(minutes=link_expiration),
         status='pending'
     )
     for link in expired_links:
@@ -260,6 +265,16 @@ class LogoutView(View):
 
 
 @login_required
+def serve_avatar(request, filename):
+    avatar_path = os.path.join(settings.AVATAR_UPLOAD_DIR, filename)
+    try:
+        with open(avatar_path, "rb") as f:
+            return HttpResponse(f.read(), content_type="image/png")
+    except FileNotFoundError:
+        return HttpResponse("Avatar not found", status=404)
+
+
+@login_required
 def profile(request):
     user = request.user
     profile, created = Profile.objects.get_or_create(user=user)
@@ -276,6 +291,11 @@ def edit_profile(request):
         if form.is_valid():
             if 'avatar' in request.FILES:
                 profile.avatar = request.FILES['avatar']
+                profile.save()  # Save the profile to get the file path
+                # Get the file path of the saved avatar
+                avatar_path = profile.avatar.path
+                # Set permissions for the file
+                os.chmod(avatar_path, 0o644)  # Adjust permissions as needed
             if 'delete_avatar' in request.POST:
                 profile.avatar.delete()
             form.save()
@@ -368,4 +388,22 @@ def reset_password(request, token, uid):
 
 def manage_roles(request):
     users = User.objects.all()
+    if request.method == 'POST':
+        for user in users:
+            new_role = request.POST.get(f"roleSelect{user.id}")
+            user_roles = UserRoles.objects.get_or_create(user=user)[0]
+            if user_roles.role != new_role:
+                user_roles.role = new_role
+                user_roles.save()
+                user.groups.clear()
+                if new_role == 'admin':
+                    user.is_staff = True
+                    user.is_superuser = True
+                elif new_role == 'manager':
+                    user.is_staff = True
+                    user.is_superuser = False
+                else:
+                    user.is_staff = False
+                    user.is_superuser = False
+                user.save()
     return render(request, 'manage_roles.html', {'users': users})

@@ -9,11 +9,7 @@ urlpatterns = [
     path('quiz/', include('src.apps.quiz.urls')),
     path('account/', include('src.apps.userAuth.urls')),
     path('courses/', include('src.apps.courses.urls'))
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-
-# + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
