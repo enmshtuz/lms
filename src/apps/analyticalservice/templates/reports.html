@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to My Website</h1>
+        <a href="{% url 'logout' %}">Logout</a>
+        <p>This is a sample HTML page.</p>
+        
+        <h1>My Form</h1>
+        <form action="{% url 'reports' %}" method="GET">
+            {% csrf_token %}
+            {{  form_enrollment }}
+            <br>
+            <button type="submit" value="Submit" name = "form_enrollment">Submit</button>
+            <br>
+            <br>
+            <h1>Top 10 Courses by Enrollment</h1>
+            <ul>
+                {% if enrollment_data %}
+                    {% for course in enrollment_data %}
+                        <li>{{ course.0 }} - {{ course.1 }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>No enrollment data available for the selected date range.</li>
+                {% endif %}
+            </ul>
+            <br>
+            <br>
+            <br>
+            {{  form_rating }}
+            <br>
+            <button type="submit" value="Submit" name = "form_rating">Submit</button>
+            <br>
+            <br>
+            <h1>Top 10 courses by rating</h1>
+            <ul>
+                {% if rating_data %}
+                    {% for course in rating_data %}
+                        <li>{{ course.0 }} - {{ course.1 }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>No enrollment data available for the selected date range.</li>
+                {% endif %}
+            </ul>
+
+   
+        </form>
+        <p>You can add more content here.</p>
+    </div>
+</body>
+</html>
