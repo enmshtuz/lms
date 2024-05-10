@@ -17,12 +17,10 @@ class Quiz(models.Model):
 
     title = models.CharField(max_length=100)
     complexity = models.CharField(max_length=20, choices=LEVEL_CHOICES)
-    attempts = models.IntegerField(default=1, choices=[(i, i) for i in range(1, 4)])
-    deadline = models.IntegerField(help_text="Deadline in minutes")
+    attempts_allowed = models.IntegerField(default=1)
+    deadline_minutes = models.IntegerField(default=1)
     success_criteria = models.IntegerField(default=100, validators=[MinValueValidator(1), MaxValueValidator(101)])
     is_published = models.BooleanField(default=False)
-    attempts_allowed = models.IntegerField(default=1)
-    deadline_minutes = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -30,33 +28,41 @@ class Quiz(models.Model):
 
 class Question(models.Model):
     objects = None
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    text = models.CharField(max_length=200)
-    TYPE_CHOICES = [
+    QUIZ_TYPES = (
         ('radio', 'Radio'),
         ('checkbox', 'Checkbox'),
-    ]
-    question_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    )
+    text = models.TextField()
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    question_type = models.CharField(max_length=10, choices=QUIZ_TYPES)
 
     def __str__(self):
-        return self.text
+        return self.question_type
 
 
 class Answer(models.Model):
     objects = None
+    text = models.TextField()
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    text = models.CharField(max_length=255)
-    is_correct = models.BooleanField(default=False)
+    is_correct = models.BooleanField()
 
     def __str__(self):
         return self.text
 
 
-class Attempt(models.Model):
-    objects = None
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    attempts_remaining = models.IntegerField(default=1, help_text="Range: 1-10")
+# class QuizResult(models.Model):
+#     objects = None
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+#     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+#     submitted_answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f"{self.user.username} - {self.quiz.title}"
+
+# class Attempt(models.Model):
+#     objects = None
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+#     attempts_remaining = models.IntegerField(default=1, help_text="Range: 1-10")
+#
+#     def __str__(self):
+#         return f"{self.user.username} - {self.quiz.title}"

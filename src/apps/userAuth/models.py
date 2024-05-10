@@ -92,6 +92,8 @@ class InvitationLink(models.Model):
 
 
 class UserRoles(models.Model):
+    DoesNotExist = None
+    objects = None
     ROLE_CHOICES = (
         ('user', 'User'),
         ('manager', 'Manager'),

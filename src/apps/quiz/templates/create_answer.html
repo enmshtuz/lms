@@ -1,0 +1,43 @@
+<!--{% extends 'layouts/base-fullscreen.html' %}-->
+<!--{% load i18n static admin_soft %}-->
+
+<!--{% block content %}-->
+<!--    {% include 'sidebar.html' %}-->
+<!--    <style>-->
+<!--        #answerInput {-->
+<!--            height: 30px;-->
+<!--        }-->
+
+<!--        .custom-card {-->
+<!--            margin-left: 120px;-->
+<!--        }-->
+<!--    </style>-->
+<!--    <main class="container mt-5">-->
+<!--        <div class="row justify-content-center">-->
+<!--            <div class="col-md-8">-->
+<!--                <div class="card shadow custom-card">-->
+<!--                    <div class="card-header">-->
+<!--                        <h4 class="m-0 font-weight-bold">Create Answer</h4>-->
+<!--                    </div>-->
+<!--                    <div class="card-body">-->
+<!--                        <form id="answerForm" method="POST" action="{% url 'create_answer' %}">-->
+<!--                            {% csrf_token %}-->
+<!--                            <div class="mb-3">-->
+<!--                                <label for="answerInput" class="form-label">Answer Text</label>-->
+<!--                                <input type="text" name="text" id="answerInput" class="form-control form-control-sm">-->
+<!--                            </div>-->
+<!--                            <div class="mb-3">-->
+<!--                                <label class="form-label">Is Correct?</label><br>-->
+<!--                                <div class="form-check form-check-inline">-->
+<!--                                    <input class="form-check-input" type="checkbox" name="is_correct" value="true">-->
+<!--                                    <label class="form-check-label">Yes</label>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <button type="submit" class="btn btn-primary">Create Answer</button>-->
+<!--                        </form>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </main>-->
+<!--{% endblock %}-->

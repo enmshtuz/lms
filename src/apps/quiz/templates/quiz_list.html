@@ -58,9 +58,14 @@
                                 <td>
                                     <a href="{% url 'quiz_update' quiz.pk %}">Edit</a> |<!-- Existing Edit Link -->
                                     <a href="{% url 'quiz_delete' quiz.pk %}">Delete</a> |
-                                    <a href="{% url 'publish_quiz' quiz.pk %}">Publish</a> |
-                                    <a href="{% url 'unpublish_quiz' quiz.pk %}">Unpublish</a>
-                                    <!-- Existing Delete Link -->
+                                    <form method="post" action="{% url 'publish_quiz' quiz.pk %}">
+                                        {% csrf_token %}
+                                           {% if quiz.is_published %}
+                                              <a href="{%url 'unpublish_quiz' quiz.pk %}">Unpublish</a>
+                                           {% else %}
+                                              <a href="{% url 'publish_quiz' quiz.pk %}">Publish</a>
+                                           {% endif %}
+                                    </form>
                                 </td>
                             </tr>
                             {% endfor %}

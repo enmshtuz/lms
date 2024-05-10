@@ -1,0 +1,40 @@
+<!--{% extends 'layouts/base-fullscreen.html' %}-->
+<!--{% load i18n static admin_soft %}-->
+
+<!--{% block content %}-->
+<!--   {% include 'sidebar.html' %}-->
+<!--   <style>-->
+<!--       #emailInput {-->
+<!--          height: 30px;-->
+<!--       }-->
+
+<!--       #sendInvitationBtn {-->
+<!--          height: 30px;-->
+<!--          width: 180px;-->
+<!--       }-->
+
+<!--       .custom-card {-->
+<!--          margin-left: 120px;-->
+<!--       }-->
+<!--   </style>-->
+<!--   <main class="container mt-5">-->
+<!--       <div class="row justify-content-center">-->
+<!--           <div class="col-md-8">-->
+<!--               <div class="card shadow custom-card">-->
+<!--                   <div class="card-header">-->
+<!--                       <h4 class="m-0 font-weight-bold">Create Question</h4>-->
+<!--                   </div>-->
+<!--                   <div class="card-body">-->
+<!--                       <form id="questionForm" method="POST" action="{% url 'create_question' %}">-->
+<!--                           {% csrf_token %}-->
+<!--                           <div class="mb-3">-->
+<!--                               {{ form.as_p }}-->
+<!--                           </div>-->
+<!--                           <button type="submit" class="btn btn-primary">Create Question</button>-->
+<!--                       </form>-->
+<!--                   </div>-->
+<!--               </div>-->
+<!--           </div>-->
+<!--       </div>-->
+<!--   </main>-->
+<!--{% endblock %}-->
