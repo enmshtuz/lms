@@ -1,6 +1,7 @@
 from django import forms
 from .models import Badge
 
+
 class BadgeForm(forms.ModelForm):
     class Meta:
         model = Badge
@@ -13,4 +14,3 @@ class BadgeForm(forms.ModelForm):
 #         widgets = {
 #             'badges': forms.SelectMultiple(attrs={'class': 'form-control'})
 #         }
-

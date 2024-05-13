@@ -24,6 +24,6 @@ urlpatterns = [
     path('', include('admin_soft.urls')),
     path('feedback/', include('src.apps.feedback.urls')),
     path('CRUD_badge/', include('src.apps.CRUD_badge.urls')),
+    path('NewsLetter/', include('src.apps.NewsLetter.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import FeedbackForm
 from .models import Course
 
+
 @login_required
 def submit_feedback(request, course_id):
     course = Course.objects.get(pk=course_id)

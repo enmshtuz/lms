@@ -1,9 +1,10 @@
 from django.core.paginator import Paginator
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import Badge
 from .forms import BadgeForm
+
 
 @staff_member_required
 def create_badge(request):
@@ -15,6 +16,7 @@ def create_badge(request):
     else:
         form = BadgeForm()
     return render(request, 'create_badge.html', {'form': form})
+
 
 @staff_member_required
 def update_badge(request, badge_id):
@@ -28,18 +30,23 @@ def update_badge(request, badge_id):
         form = BadgeForm(instance=badge)
     return render(request, 'update_badge.html', {'form': form})
 
-@staff_member_required
-def delete_badge(request, badge_id):
-    badge = Badge.objects.get(pk=badge_id)
+
+def badge_delete(request, badge_id):
+    badge = get_object_or_404(Badge, pk=badge_id)
     if request.method == 'POST':
         badge.delete()
         return redirect('badge_list')
-    return render(request, 'delete_badge.html', {'badge': badge})
+    return render(request, 'badge_confirm_delete.html', {'badge': badge})
+
+
 
 @login_required
 def badge_list(request):
     badges = Badge.objects.all()
-    return render(request, 'badge_list.html', {'badges': badges})
+    paginator = Paginator(badges, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'badge_list.html', {'page_obj': page_obj})
 #
 # @login_required
 # def create_course(request):
