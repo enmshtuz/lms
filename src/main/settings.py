@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'src.apps.analyticalservice.apps.AnalyticalserviceConfig'
-
 ]
 
 MIDDLEWARE = [
