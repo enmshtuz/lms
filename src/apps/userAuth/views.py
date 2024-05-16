@@ -101,7 +101,7 @@ def update_expired_links_status():
     site_settings = SiteSettings.objects.first()
     link_expiration = site_settings.invitation_link_expiration_days
     expired_links = InvitationLink.objects.filter(
-        created_at__lte=timezone.now() - timezone.timedelta(minutes=link_expiration),
+        created_at__lte=timezone.now() - timezone.timedelta(days=link_expiration),
         status='pending'
     )
     for link in expired_links:
@@ -110,9 +110,12 @@ def update_expired_links_status():
 
 
 def register_invitation(request):
-    update_expired_links_status()
-    invitation_links = InvitationLink.objects.all()
-    return render(request, 'registration_invitation.html', {'invitation_links': invitation_links})
+    if is_admin(request):
+        update_expired_links_status()
+        invitation_links = InvitationLink.objects.all()
+        return render(request, 'registration_invitation.html', {'invitation_links': invitation_links})
+    else:
+        return render(request, 'unauthorized_access.html')
 
 
 def send_invitation_email(email, token, uid):
@@ -249,6 +252,9 @@ class UserLoginView(FormView):
             verification = EmailVerification.objects.filter(user=user).first()
             if verification and verification.token is None:
                 login(self.request, user)
+                next_url = self.request.GET.get('next')
+                if next_url:
+                    self.success_url = next_url
                 return super().form_valid(form)
             else:
                 form.add_error(None, 'Your email is not verified.')
@@ -289,6 +295,10 @@ def edit_profile(request):
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
+            if 'avatar' in request.FILES and 'delete_avatar' in request.POST:
+                form.add_error(None, "Either upload a new avatar or delete the existing one, not both.")
+                return render(request, 'edit_profile.html', {'form': form})
+
             if 'avatar' in request.FILES:
                 profile.avatar = request.FILES['avatar']
                 profile.save()  # Save the profile to get the file path
@@ -298,6 +308,12 @@ def edit_profile(request):
                 os.chmod(avatar_path, 0o644)  # Adjust permissions as needed
             if 'delete_avatar' in request.POST:
                 profile.avatar.delete()
+
+            # Update user authentication data
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.save()
+
             form.save()
             return redirect('profile')
     else:
@@ -307,22 +323,24 @@ def edit_profile(request):
 
 
 @login_required
-@staff_member_required
 def site_settings(request):
-    site_settings_instance, _ = SiteSettings.objects.get_or_create(pk=1)
+    if is_admin(request):
+        site_settings_instance, _ = SiteSettings.objects.get_or_create(pk=1)
 
-    if request.method == 'POST':
-        site_settings_instance.open_registration = bool(request.POST.get('open_registration'))
-        site_settings_instance.verification_link_expiration_hours = int(
-            request.POST.get('verification_link_expiration_hours'))
-        site_settings_instance.invitation_link_expiration_days = int(
-            request.POST.get('invitation_link_expiration_days'))
-        site_settings_instance.save()
+        if request.method == 'POST':
+            site_settings_instance.open_registration = bool(request.POST.get('open_registration'))
+            site_settings_instance.verification_link_expiration_hours = int(
+                request.POST.get('verification_link_expiration_hours'))
+            site_settings_instance.invitation_link_expiration_days = int(
+                request.POST.get('invitation_link_expiration_days'))
+            site_settings_instance.save()
 
-        messages.success(request, 'Settings saved successfully.')
-        return HttpResponseRedirect(reverse('profile'))
+            messages.success(request, 'Settings saved successfully.')
+            return HttpResponseRedirect(reverse('profile'))
 
-    return render(request, 'site_settings.html', {'site_settings': site_settings_instance})
+        return render(request, 'site_settings.html', {'site_settings': site_settings_instance})
+    else:
+        return render(request, 'unauthorized_access.html')
 
 
 def generate_token():
@@ -386,24 +404,40 @@ def reset_password(request, token, uid):
     return render(request, 'password_reset_confirm.html', {'form': form})
 
 
+@login_required
 def manage_roles(request):
-    users = User.objects.all()
-    if request.method == 'POST':
-        for user in users:
-            new_role = request.POST.get(f"roleSelect{user.id}")
-            user_roles = UserRoles.objects.get_or_create(user=user)[0]
-            if user_roles.role != new_role:
-                user_roles.role = new_role
-                user_roles.save()
-                user.groups.clear()
-                if new_role == 'admin':
-                    user.is_staff = True
-                    user.is_superuser = True
-                elif new_role == 'manager':
-                    user.is_staff = True
-                    user.is_superuser = False
-                else:
-                    user.is_staff = False
-                    user.is_superuser = False
-                user.save()
-    return render(request, 'manage_roles.html', {'users': users})
+    if is_admin(request):
+        users = User.objects.all()
+        if request.method == 'POST':
+            for user in users:
+                new_role = request.POST.get(f"roleSelect{user.id}")
+                user_roles = UserRoles.objects.get_or_create(user=user)[0]
+                if user_roles.role != new_role:
+                    user_roles.role = new_role
+                    user_roles.save()
+                    user.groups.clear()
+                    if new_role == 'admin':
+                        user.is_staff = True
+                        user.is_superuser = True
+                    elif new_role == 'manager':
+                        user.is_staff = True
+                        user.is_superuser = False
+                    else:
+                        user.is_staff = False
+                        user.is_superuser = False
+                    user.save()
+        users = User.objects.all()
+        return render(request, 'manage_roles.html', {'users': users})
+    else:
+        return render(request, 'unauthorized_access.html')
+
+
+def is_admin(request):
+    user = request.user
+    if user.is_authenticated:
+        try:
+            user_role = UserRoles.objects.get(user=user)
+            return user_role.role == 'admin'
+        except UserRoles.DoesNotExist:
+            return False
+    return False

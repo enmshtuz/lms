@@ -4,8 +4,8 @@ from .views import (register, register_closed, register_invitation,
                     register_success, verification_failure, invalid_link,
                     verify_email, UserLoginView, LogoutView, password_reset,
                     password_reset_complete, reset_password,
-                    serve_avatar, profile, edit_profile, site_settings,
-                    manage_roles)
+                    serve_avatar, profile, edit_profile,
+                    site_settings, manage_roles)
 
 urlpatterns = [
     path('register/', register, name='register'),
