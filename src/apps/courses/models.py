@@ -24,10 +24,9 @@ class Course(models.Model):
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
     publish_date = models.DateTimeField(default=timezone.now)
     is_published = models.BooleanField(default=False)
-    # published_date = models.DateTimeField(null=True, blank=True)
     file = models.FileField(upload_to='course_files/', null=True, blank=True)
     video = models.FileField(upload_to='course_videos/', null=True, blank=True)
-    url = models.URLField(max_length=200, null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
 
     def publish(self):
         self.is_published = True
@@ -42,21 +41,10 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
-    # @property
-    # def enrolled_users_count(self):
-    #     return self.enrollment_set.count()
+    def calculate_enrolled_count(self):
+        return self.enrollment_set.count()
 
 
-# class Enrollment(models.Model):
-#     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-#     course = models.ForeignKey('Course', on_delete=models.CASCADE)
-#     enrolled_date = models.DateTimeField(auto_now_add=True)
-#
-#     def __str__(self):
-#         return f"{self.user.username} enrolled in {self.course.title}"
-
-
-# #last commented
 class Enrollment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -67,59 +55,15 @@ class Enrollment(models.Model):
         unique_together = ('user', 'course')
 
 
-# class CourseEnrollment(models.Model):
-#     class Meta:
-#         db_table = 'courses_enrollment'
-#
-#     ENROLLMENT_TYPE_CHOICES = [
-#         (0, 'Self-Enrollment'),
-#         (1, 'Manager-Enrollment')
-#     ]
-#
-#     enrolled_at = models.DateTimeField(auto_now_add=True)
-#     course = models.ForeignKey('Course', related_name='enrollments', on_delete=models.CASCADE)
-#     user = models.ForeignKey(User, related_name='course_enrollments', on_delete=models.CASCADE)
-#     enrollment_type = models.IntegerField(choices=ENROLLMENT_TYPE_CHOICES, default=0)
-#
-#     @classmethod
-#     def update_enrollment(cls, user, course, is_forced=False):
-#         if is_forced:
-#             enrollment_type = 1
-#         else:
-#             enrollment_type = 0
-#
-#         if enrollment_type == 1:
-#             result = cls.objects.update_or_create(user=user, course=course, defaults={'enrollment_type': enrollment_type})
-#         else:
-#             # Check if the user is already enrolled, if so, don't update
-#             if not cls.objects.filter(user=user, course=course).exists():
-#                 result = cls.objects.create(user=user, course=course, enrollment_type=enrollment_type)
-#             else:
-#                 result = None
-#         return result
+class Resource(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    type = models.CharField(max_length=100)
+    meta = models.CharField(max_length=100)
 
 
+class Progress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+    completed = models.BooleanField(default=False)
 
-# class CourseEnrollment(models.Model):
-#     ENROLLMENT_TYPE_CHOICES = [
-#         (0, 'Self-Enrollment'),
-#         (1, 'Manager-Enrollment')
-#     ]
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-#     enrollment_date = models.DateTimeField(default=timezone.now)
-#     enrollment_type = models.IntegerField(choices=ENROLLMENT_TYPE_CHOICES, default=0)
-
-
-
-    # class Meta:
-    #     unique_together = ('user', 'course')
-
-# class CourseEnrollment(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-#     enrollment_time = models.DateTimeField(default=timezone.now)
-#     is_forced_enrollment = models.BooleanField(default=False)
-#
-#     def __str__(self):
-#         return f"{self.user.username} enrolled in {self.course.title} at {self.enrollment_time}"

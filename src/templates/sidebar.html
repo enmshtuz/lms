@@ -33,10 +33,21 @@
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="fas fa-book text-dark"></i>
                     </div>
-                    <span class="nav-link-text ms-1">{{ _('Courses') }}</span>
+                    <span class="nav-link-text ms-1">{{ _('Available Courses') }}</span>
                 </a>
             </li>
-            {% else %}
+            {% endif %}
+            {% if user.userroles.role == 'user' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'my_courses_list' %}">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-book text-dark"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">{{ _('My Courses') }}</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% if user.userroles.role == 'manager' or user.userroles.role == 'admin' %}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                    data-bs-toggle="dropdown" aria-expanded="false">
@@ -48,6 +59,7 @@
                 <ul class="dropdown-menu dropdown-menu-dark custom-dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="{% url 'course_create' %}">{{ _('Create Course') }}</a></li>
                     <li><a class="dropdown-item" href="{% url 'course_list' %}">{{ _('Courses List') }}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'published_course_list' %}">{{ _('Published Courses List') }}</a></li>
                 </ul>
             </li>
             {% endif %}

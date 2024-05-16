@@ -32,26 +32,31 @@
                       <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                           <i class="fas fa-book text-dark"></i>
                       </div>
+                      <span class="nav-link-text ms-1">{{ _('Available Courses') }}</span>
+                  </a>
+              </li>
+               {% endif %}
+                {% if user.userroles.role == 'user' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'my_courses_list' %}">
+                            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                                <i class="fas fa-book text-dark"></i>
+                            </div>
+                            <span class="nav-link-text ms-1">{{ _('My Courses') }}</span>
+                        </a>
+                    </li>
+                {% endif %}
+              {% if user.userroles.role == 'admin' or user.userroles.role == 'manager' %}
+              <li class="nav-item">
+                  <a class="nav-link" href="#" id="navbarDropdown" role="button"
+                     aria-expanded="false">
+                      <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                          <i class="fas fa-plus-circle text-dark"></i>
+                      </div>
                       <span class="nav-link-text ms-1">{{ _('Courses') }}</span>
                   </a>
               </li>
-            {% endif %}
-              {% if user.userroles.role == 'manager' or user.userroles.role == 'admin' %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-plus-circle text-dark"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">{{ _('Courses') }}</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark custom-dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="{% url 'course_create' %}">{{ _('Create Course') }}</a></li>
-                        <li><a class="dropdown-item" href="{% url 'course_list' %}">{{ _('Courses List') }}</a></li>
-                        <li><a class="dropdown-item" href="{% url 'published_course_list' %}">{{ _('Published Courses List') }}</a></li>
-                    </ul>
-                </li>
-            {% endif %}
+              {% endif %}
               <li class="nav-item">
                   <a class="nav-link" href="{% url 'logout' %}">
                       <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -78,21 +83,20 @@
     <div class="col-12">
       <div class="card mb-4">
         <div class="card-header pb-0">
-          <h6>Authors table</h6>
+          <h6>My Courses</h6>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-0">
             <table class="table align-items-center mb-0">
               <thead>
                 <tr>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Title</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Description</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Title</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Description</th>
                   <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Level</th>
                   <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Publish Date</th>
                   <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                         Users Enrolled {{ course.enrolled_count }}
                   </th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -101,37 +105,21 @@
                         <td>
                             <div class="d-flex px-2 py-1">
                               <div class="d-flex flex-column justify-content-center">
-                                <a class="mb-0 text-sm" href="{% url 'course_update' course.pk %}">{{ course.title }}</a>
+                                <a class="mb-0 text-sm" href="{% url 'details_course' course.pk %}">{{ course.title }}</a>
                               </div>
                             </div>
                         </td>
                         <td>
-                            <p class="text-xs font-weight-bold mb-0">{{ course.description }}</p>
+                            <p style="text-align: center;" class="text-xs font-weight-bold mb-0">{{ course.description }}</p>
                         </td>
                         <td>
-                            <p class="text-xs font-weight-bold mb-0">{{ course.level }}</p>
+                            <p style="text-align: center;" class="text-xs font-weight-bold mb-0">{{ course.level }}</p>
                         </td>
                         <td>
-                            <p class="text-xs font-weight-bold mb-0">{{ course.publish_date }}</p>
+                            <p style="text-align: center;" class="text-xs font-weight-bold mb-0">{{ course.publish_date }}</p>
                         </td>
                         <td>
                             <p style="text-align: center;" class="text-xs font-weight-bold mb-0">{{ course.enrolled_count }}</p>
-                        </td>
-                        <td>
-                          <a href="{% url 'course_update' course.pk %}">Edit</a> |  <!-- Existing Edit Link -->
-                          {% if not course.is_enrolled %}
-                            <a href="{% url 'course_delete' course.pk %}">Delete</a> |  <!-- Existing Delete Link -->
-                          {% else %}
-                            <span>Delete</span> |  <!-- Existing Delete Link -->
-                          {% endif %}
-                          <form method="post" action="{% url 'publish_course' course.pk %}">
-                            {% csrf_token %}
-                              {% if course.is_published %}
-                                    <a href="{% url 'unpublish_course' course.pk %}">Unpublish</a>
-                              {% else %}
-                                    <a href="{% url 'publish_course' course.pk %}">Publish</a>
-                              {% endif %}
-                          </form>
                         </td>
                       </tr>
                   {% endfor %}
