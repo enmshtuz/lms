@@ -1,5 +1,5 @@
-{% extends 'layouts/base.html' %}
-{% load static %}
+{% extends 'layouts/base-fullscreen.html' %}
+{% load i18n static admin_soft %}
 
 {% block content %}
 
@@ -11,19 +11,301 @@
     <title>Course Enrollment Details</title>
 </head>
 <body>
-    <h1>Course Details</h1>
-    <p><strong>Course Description:</strong> {{ course.description }}</p>
-    <p><strong>Course Level:</strong> {{ course.level }}</p>
-    <p><strong>Published Date:</strong> {{ course.publish_date }}</p>
-    <p><strong>People Enrolled:</strong> {{ course.enrolled_users_count }}</p>
-    <a target="_blank" class="mb-3 text-sm" href="{{ course.url }}">Click for course deck</a>
-    <form method="post" action="{% url 'published_course_list' %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-link text-dark px-3 mb-0"><i class="fa fa-reply-all text-dark me-2" aria-hidden="true"></i>Go To Published Courses</button>
-    </form>
+    <style>
+        .table th {
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        .table td {
+            font-size: 13px;
+            padding: 10px;
+        }
+
+        .form-select {
+            width: 100%;
+            height: auto;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #f2f2f2;
+            border-radius: 5px;
+            border: 2px solid #ccc; /* Border for the progress bar container */
+            overflow: hidden;
+        }
+
+        .progress {
+            width: 50%; /* Change this value to adjust the progress */
+            height: 30px;
+            background-color: #cb0c9f; /* Change this color to adjust the progress color */
+            border-right: 1px solid #ccc; /* Border for the progress indicator */
+        }
+    </style>
+    <div style="display: flex;">
+        <aside style="position: sticky" class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 "
+        id="sidenav-main">
+        <div class="sidenav-header">
+            <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+                aria-hidden="true" id="iconSidenav"></i>
+            <a class="navbar-brand m-0" href="{% url 'admin:index' %}">
+            </a>
+        </div>
+        <hr class="horizontal dark mt-0">
+        <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link  " href="{% url 'profile' %}">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-users text-dark"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">{{ _('Profile') }}</span>
+                    </a>
+                </li>
+                {% if user.role == 'user' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'published_course_list' %}">
+                            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                                <i class="fas fa-book text-dark"></i>
+                            </div>
+                            <span class="nav-link-text ms-1">{{ _('Courses') }}</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if user.userroles.role == 'manager' or user.userroles.role == 'admin' %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                                <i class="fas fa-plus-circle text-dark"></i>
+                            </div>
+                            <span class="nav-link-text ms-1">{{ _('Courses') }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark custom-dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url 'course_create' %}">{{ _('Create Course') }}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'course_list' %}">{{ _('Courses List') }}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'published_course_list' %}">{{ _('Published Courses List') }}</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-sign-out-alt text-dark"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">{{ _('Logout') }}</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        </aside>
+        <div style="width: -webkit-fill-available;" class="container-fluid py-4">
+            <div class="row">
+                <div style="margin-left: 0px !important; width: 94.6% !important;" class="col-md-8 mx-auto">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary py-3">
+                            <h6 style="font-size: larger;" class="m-0 font-weight-bold text-white">{{ course.title }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <div >
+                                <div style="display: flex;">
+                                    <p><strong>Course Description:</strong> {{ course.description }}</p> <div style="margin-left: 60% !important;" class="ms-auto text-end">
+                                        {% if course.is_published %}
+                                            <!-- {% if request.user.is_authenticated %} -->
+                                                {% if user.role == 'admin'%}
+                                                    <form method="post" action="{% url 'users_list' course.pk %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-link text-dark px-3 mb-0" id="force_enroll"><i class="fa fa-user-plus text-dark me-2"></i>Enroll User</button>
+                                                    </form>
+                                                {% endif %}
+                                                {% if  user.role == 'user'%}
+                                                    {% if course.is_enrolled and not course.is_forced_enrolled%}
+                                                        <a style="padding: 0px;" class="btn btn-link text-dark px-3 mb-0" href="{% url 'unenroll_course' course.pk %}"><i class="fa fa-user-times text-dark me-2" aria-hidden="true"></i>Unenroll</a>
+                                                    {% else %}
+                                                        <a style="padding: 0px;" class="btn btn-link text-dark text-gradient px-3 mb-0" href="{% url 'enroll_course' course.pk %}"><i class="fa fa-user-plus text-dark me-2"></i>Enroll</a>
+                                                    {% endif %}
+                                                {% endif %}
+                                            <!-- {% else %} -->
+                                                <!-- <a href="{% url 'login' %}">Login to Enroll</a> -->
+                                            <!-- {% endif %} -->
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <p><strong>Course Level:</strong> {{ course.level }}</p>
+                                <p><strong>Published Date:</strong> {{ course.publish_date }}</p>
+                                <p><strong>People Enrolled:</strong> {{ course.enrolled_count }}</p>
+                                {% if course.is_enrolled and not course.is_forced_enrolled%}
+                                    <a target="_blank" class="mb-3 text-sm" href="{{ course.url }}">Click for course deck</a>
+                                {% endif %}
+
+                                <form method="post" action="{% url 'published_course_list' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link text-dark px-3 mb-0"><i class="fa fa-reply-all text-dark me-2" aria-hidden="true"></i>Go To Published Courses</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if course.is_enrolled and user.userroles.role == 'user'%}
+                <div style="margin-top: 20px;" class="row">
+                    <div style="margin-left: 0px !important; width: 94.6% !important;" class="col-md-8 mx-auto">
+                        <div class="card shadow">
+                            <div class="card-header bg-primary py-3">
+                                <h6 style="font-size: larger;" class="m-0 font-weight-bold text-white">Youre Progress</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table align-middle table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>Resource</th>
+                                            <th>Completed</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for resource in course_resources %}
+                                                <tr>
+                                                    <td><a target="_blank" class="mb-3 text-sm" href="{{ resource.meta }}">Resource {{ forloop.counter }}</a></td>
+                                                    <td><input type="checkbox" class="resource-checkbox" data-resource-id="{{ resource.progress_id }}" {% if resource.completed %}checked{% endif %}></td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <div>
+                                        <h4>Total Progress:</h4>
+                                        <div style="height: 12px;" class="progress-bar">
+                                            <div style="height: 12px; width: {{ completed_parcent }}%;" class="progress"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if user.userroles.role != 'user' and users_list %}
+                <div style="margin-top: 20px;" class="row">
+                    <div style="margin-left: 0px !important; width: 94.6% !important;" class="col-md-8 mx-auto">
+                        <div class="card shadow">
+                            <div class="card-header bg-primary py-3">
+                                <h6 style="font-size: larger;" class="m-0 font-weight-bold text-white">Users List</h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table align-middle table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th  style="text-align: center;">User</th>
+                                        <th  style="text-align: center;">Force Enroll</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users_list %}
+                                            <tr>
+                                                <td style="text-align: center;"><a target="_blank" class="mb-3 text-sm" href="{{ resource.meta }}">{{ user }}</a></td>
+                                                <td style="text-align: center;"><input data-course-id="{{ course.id }}" {% if user.is_forced_enrollment %}checked{% endif %} data-user-id="{{ user.id }}" type="checkbox" class="forc_enroll-checkbox"></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <button style="margin-left: 43%;" data-course-id="{{ course.id }}" data-checked-users="{{document.checkedUsers}}" class="submit-force-enroll btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    checkedUsers = []
+    Array.prototype.forEach.call(document.getElementsByClassName('forc_enroll-checkbox'), element => {
+       element.addEventListener('click', function() {
+            // Make an AJAX request to your Django backend
+            let xhr = new XMLHttpRequest();
+            let isChecked = $(this).is(':checked');
+            let userId = $(this).data('user-id');
+            let courseId = $(this).data('course-id');
+            let userInCheckedArray = checkedUsers.findIndex(user => user.userId === userId)
+            if(isChecked && userInCheckedArray === -1) {
+                checkedUsers.push({userId, courseId})
+            }
+            if(!isChecked && userInCheckedArray !== -1) {
+                checkedUsers = document.checkedUsers.filter(user => user.userId !== userId)
+            }
+
+            document.getElementsByClassName('submit-force-enroll')[0].setAttribute("data-checked-users", JSON.stringify(checkedUsers));
+        });
+    });
+    $('.submit-force-enroll').click(function() {
+        let csrftoken = getCookie('csrftoken');
+        var checkedUsers = $(this).data('checked-users');
+        let courseId = $(this).data('course-id');
+        $.ajax({
+            type: 'POST',
+            url: '/course/32/details/force_enroll/',  // URL to your Django view for updating progress
+            headers: {
+                'X-CSRFToken': csrftoken,  // Include CSRF token in request headers
+            },
+            data: {
+                'courseId': courseId,
+                'checked_users': JSON.stringify(checkedUsers)
+            },
+            success: function(data) {
+                console.log('Progress updated successfully');
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                console.error('Error updating progress:', errorThrown);
+            }
+        });
+    })
+
+    $('.resource-checkbox').click(function() {
+        var resourceId = $(this).data('resource-id');
+        var isChecked = $(this).is(':checked');
+        // Get CSRF token from cookie
+        var csrftoken = getCookie('csrftoken');
+
+        $.ajax({
+            type: 'POST',
+            url: '/course/32/details/update_progress/',  // URL to your Django view for updating progress
+            headers: {
+                'X-CSRFToken': csrftoken  // Include CSRF token in request headers
+            },
+            data: {
+                'resource_id': resourceId,
+                'completed': isChecked
+            },
+            success: function(data) {
+                console.log('Progress updated successfully');
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                console.error('Error updating progress:', errorThrown);
+            }
+        });
+    });
+
+    // Function to retrieve CSRF token from cookies
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+
+
+
 </html>
 
 {% endblock content %}
-
-

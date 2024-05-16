@@ -51,7 +51,6 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx.conf:ro
-#      - ./src/lms/static:/lms/static:ro #this is new
     depends_on:
       web:
         condition: service_healthy
@@ -66,7 +65,7 @@ services:
 
 networks:
   web_network:
-    driver: bridge #this part is new
+    driver: bridge
   web_db_network:
     *network-driver
 
@@ -74,3 +73,6 @@ volumes:
   db_data:
   static_volume:
   media_volume:
+
+
+

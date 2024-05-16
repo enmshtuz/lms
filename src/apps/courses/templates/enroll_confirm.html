@@ -14,15 +14,15 @@
               <div class="card card-plain mt-8">
                 <div class="card-header pb-0 text-left bg-transparent">
                   <h3 class="font-weight-bolder text-info text-gradient">
-                    Confirm Delete
+                    Confirm Action
                   </h3>
                 </div>
                 <div class="card-body">
-                  <p>Are you sure you want to delete "{{ course.title }}"?</p>
+                  <p>Are you sure you want to {% if course.is_enrolled %}unenroll{% else %}enroll{% endif %} "{{ course.title }}"?</p>
                   <form method="post">
                       {% csrf_token %}
                       <button type="submit" class="btn btn-primary">Confirm</button>
-                      <a href="{% url 'course_list' %}" class="btn btn-secondary">Cancel</a>
+                      <a href="{% url 'details_course' course.pk%}" class="btn btn-secondary">Cancel</a>
                   </form>
                 </div>
               </div>
