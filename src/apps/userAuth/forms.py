@@ -3,7 +3,6 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.utils.translation import gettext_lazy as _
 from .models import EmailVerification, InvitationLink, Profile, User
 
-
 class RegistrationForm(UserCreationForm):
     password1 = forms.CharField(
         label=_("Password"),

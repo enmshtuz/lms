@@ -8,6 +8,13 @@
                 <div class="card">
                     <div class="card-header">Edit Profile</div>
                     <div class="card-body">
+                        {% if form.non_field_errors %}
+                            <p class="text-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </p>
+                        {% endif %}
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="mb-3">

@@ -9,7 +9,6 @@ class EmailVerification(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     token = models.UUIDField(default=uuid.uuid4, editable=False, null=True)
     created_at = models.DateTimeField(default=timezone.now, null=True)
-    is_opened = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Verification token for {self.user.username}"
@@ -75,20 +74,6 @@ class InvitationLink(models.Model):
             self.link = self.link[:self._meta.get_field('link').max_length]
 
         super().save(*args, **kwargs)
-
-
-# class Role:
-#     USER = 'User'
-#     MANAGER = 'Manager'
-#     ADMIN = 'Admin'
-#
-#     @classmethod
-#     def choices(cls):
-#         return (
-#             (cls.USER, 'User'),
-#             (cls.MANAGER, 'Manager'),
-#             (cls.ADMIN, 'Admin'),
-#         )
 
 
 class UserRoles(models.Model):

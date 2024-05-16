@@ -39,17 +39,6 @@
                                             <strong>Date of Birth:</strong> {{ profile.date_of_birth }}
                                         </div>
                                     {% endif %}
-                                    {% if request.user.is_staff %}
-                                        <a href="{% url 'site_settings' %}" class="btn btn-primary">Settings</a>
-                                    {% endif %}
-                                    {% if request.user.is_staff %}
-                                        <a href="{% url 'register_invitation' %}" class="btn btn-primary">Send
-                                            Invitation</a>
-                                    {% endif %}
-                                    {% if request.user.is_staff %}
-                                        <a href="{% url 'manage_roles' %}" class="btn btn-primary">Manage
-                                            Roles</a>
-                                    {% endif %}
                                     <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
                                 </div>
                             </div>
