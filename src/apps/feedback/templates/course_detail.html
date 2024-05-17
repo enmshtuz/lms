@@ -1,0 +1,7 @@
+{% extends 'feedback.html' %}
+
+{% block content %}
+    <h2>{{ course.title }}</h2>
+
+    <a href="{% url 'submit_feedback' course.id %}">Submit Feedback</a>
+{% endblock %}
