@@ -1,0 +1,60 @@
+{% extends 'layouts/base-fullscreen.html' %}
+{% load static %}
+
+{% block content %}
+    <main class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">Edit Profile</div>
+                    <div class="card-body">
+                        {% if form.non_field_errors %}
+                            <p class="text-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="id_first_name" class="form-label">First Name *</label>
+                                <input type="text" name="first_name" class="form-control" id="id_first_name"
+                                       placeholder="First Name" required value="{{ form.instance.first_name }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_last_name" class="form-label">Last Name *</label>
+                                <input type="text" name="last_name" class="form-control" id="id_last_name"
+                                       placeholder="Last Name" required value="{{ form.instance.last_name }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_date_of_birth" class="form-label">Date of Birth</label>
+                                <input type="date" name="date_of_birth" class="form-control" id="id_date_of_birth"
+                                       placeholder="mm/dd/yyyy"
+                                       value="{{ form.instance.date_of_birth|date:'Y-m-d' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_avatar" class="form-label">Avatar (.png format only)</label>
+                                <input type="file" name="avatar" class="form-control" id="id_avatar" accept=".png">
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" name="delete_avatar" class="form-check-input"
+                                       id="id_delete_avatar">
+                                <label class="form-check-label" for="id_delete_avatar">Delete Avatar</label>
+                            </div>
+                            <div class="mb-3">
+                                {% if form.instance.avatar %}
+                                    <img src="{{ form.instance.avatar.url }}" alt="Avatar" style="max-width: 100px; max-height: 100px;">
+                                {% else %}
+                                    <p>No avatar uploaded</p>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <a href="{% url 'profile' %}" class="btn btn-secondary">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

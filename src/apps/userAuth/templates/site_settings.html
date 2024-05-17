@@ -1,0 +1,62 @@
+{% extends 'layouts/base-fullscreen.html' %}
+{% load static %}
+
+{% block content %}
+    <main class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">Site Settings</div>
+
+                    <div class="card-body">
+                        <form method="post" id="site_settings_form">
+                            {% csrf_token %}
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="open_registration"
+                                       name="open_registration"
+                                       {% if site_settings.open_registration %}checked{% endif %}>
+                                <label class="form-check-label" for="open_registration">Open Registration</label>
+                            </div>
+                            <div class="mb-3">
+                                <label for="invitation_link_expiration_days" class="form-label">Invitation Link
+                                    Expiration (Days)</label>
+                                <input type="number" class="form-control" id="invitation_link_expiration_days"
+                                       placeholder="Invitation Link Expiration Days"
+                                       name="invitation_link_expiration_days"
+                                       required
+                                       value="{{ site_settings.invitation_link_expiration_days|stringformat:"d" }}"
+                                       step="1">
+                            </div>
+                            <div class="mb-3">
+                                <label for="verification_link_expiration_hours" class="form-label">Verification Link
+                                    Expiration (Hours)</label>
+                                <input type="number" class="form-control" id="verification_link_expiration_hours"
+                                       placeholder="Verification Link Expiration Hours"
+                                       name="verification_link_expiration_hours"
+                                       required
+                                       value="{{ site_settings.verification_link_expiration_hours|stringformat:"d" }}"
+                                       step="1">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <a href="{% url 'profile' %}" class="btn btn-secondary">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("site_settings_form").addEventListener("submit", function (event) {
+                var invitationExpiration = parseInt(document.getElementById("invitation_link_expiration_days").value);
+                var verificationExpiration = parseInt(document.getElementById("verification_link_expiration_hours").value);
+
+                if (invitationExpiration < 0 || isNaN(invitationExpiration) || verificationExpiration < 0 || isNaN(verificationExpiration)) {
+                    event.preventDefault();
+                    alert("Invalid value. Please enter a value greater than or equal to 0.");
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% load i18n static admin_soft %}
+
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 "
+       id="sidenav-main">
+    <div class="sidenav-header">
+        <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+           aria-hidden="true" id="iconSidenav"></i>
+        <a class="navbar-brand m-0" href="{% url 'admin:index' %}">
+        </a>
+    </div>
+    <hr class="horizontal dark mt-0">
+    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link  " href="{% url 'profile' %}">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-users text-dark"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">{{ _('Profile') }}</span>
+                </a>
+            </li>
+            {% if user.userroles.role == 'admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'site_settings' %}">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-cogs text-dark"></i> <!-- Changed icon to settings icon -->
+                        </div>
+                        <span class="nav-link-text ms-1">{{ _('Site Settings') }}</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% if user.userroles.role == 'admin' %}
+                <li class="nav-item">
+                <span class="nav-link d-flex justify-content-between align-items-center collapsed"
+                      data-bs-toggle="collapse" data-bs-target="#submenu-user-management" aria-expanded="false">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-users-cog text-dark"></i>
+                    </div>
+                    <a href="{% url 'site_settings' %}">
+                        <span class="nav-link-text ms-1">{{ _('User Management') }}</span>
+                    </a>
+                </span>
+                    <div class="multi-level ms-5 collapse" role="list" id="submenu-user-management" aria-expanded="false"
+                         style="">
+                        <ul class="flex-column nav">
+                            <li class="nav-item list-unstyled">
+                                <a class="nav-link" href="{% url 'register_invitation' %}">
+                                    <span class="nav-link-text ms-1">{{ _('Send Invitation') }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item list-unstyled">
+                                <a class="nav-link" href="{% url 'manage_roles' %}">
+                                    <span class="nav-link-text ms-1">{{ _('Manage Roles') }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            {% endif %}
+            {% if user.userroles.role == 'user' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'published_course_list' %}">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-book text-dark"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">{{ _('Available Courses') }}</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% if user.userroles.role == 'user' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'my_courses_list' %}">
+                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-book text-dark"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">{{ _('My Courses') }}</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% if user.userroles.role == 'manager' or user.userroles.role == 'admin' %}
+                <li class="nav-item">
+                <span class="nav-link d-flex justify-content-between align-items-center collapsed"
+                      data-bs-toggle="collapse" data-bs-target="#submenu-courses" aria-expanded="false">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-plus-circle text-dark"></i>
+                    </div>
+                    <a href="{% url 'site_settings' %}">
+                        <span class="nav-link-text ms-1">{{ _('Courses') }}</span>
+                    </a>
+                </span>
+                    <div class="multi-level ms-5 collapse" role="list" id="submenu-courses" aria-expanded="false"
+                         style="">
+                        <ul class="flex-column nav">
+                            <li class="nav-item list-unstyled">
+                                <a class="nav-link" href="{% url 'course_create' %}">
+                                    <span class="nav-link-text ms-1">{{ _('Create Course') }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item list-unstyled">
+                                <a class="nav-link" href="{% url 'course_list' %}">
+                                    <span class="nav-link-text ms-1">{{ _('Courses List') }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item list-unstyled">
+                                <a class="nav-link" href="{% url 'published_course_list' %}">
+                                    <span class="nav-link-text ms-1">{{ _('Published Courses List') }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-sign-out-alt text-dark"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">{{ _('Logout') }}</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>

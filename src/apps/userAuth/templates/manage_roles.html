@@ -1,0 +1,94 @@
+{% extends 'layouts/base-fullscreen.html' %}
+{% load i18n static admin_soft %}
+
+{% block content %}
+    {% include 'sidebar.html' %}
+    <style>
+        .custom-card {
+            margin-left: 120px;
+        }
+
+        .table th {
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        .table td {
+            font-size: 13px;
+            padding: 10px;
+        }
+
+        .form-select {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Adjustments to match the card layout */
+        .container-fluid {
+            margin-top: 50px;
+        }
+
+        .row {
+            justify-content: center;
+        }
+
+        .col-md-8 {
+            margin-bottom: 50px;
+        }
+
+        .card-header h6 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+    <div class="container-fluid py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow custom-card">
+                    <div class="card-header">
+                        <h6 class="m-0 font-weight-bold">Manage User Roles</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="table-responsive">
+                                <table class="table align-middle table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>Email Address</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Role</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for user in users %}
+                                        <tr>
+                                            <td>{{ user.email }}</td>
+                                            <td>{{ user.first_name }}</td>
+                                            <td>{{ user.last_name }}</td>
+                                            <td>
+                                                <select class="form-select form-select-sm" name="roleSelect{{ user.id }}">
+                                                    {% for role, role_name in user.userroles.ROLE_CHOICES %}
+                                                        <option value="{{ role }}" {% if user.userroles.role == role %}selected{% endif %}>{{ role_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    <!-- Extra row for column separating lines -->
+                                    <tr>
+                                        <td colspan="4"></td> <!-- Adjust colspan according to the number of columns in your table -->
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Roles</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
