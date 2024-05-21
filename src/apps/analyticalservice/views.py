@@ -88,15 +88,12 @@ def reports(request):
         form_user = UserForm(request.GET or None)
         form_course = CourseForm(request.GET or None)
 
-        # Set default start and end dates for the last 30 days
         default_start_date = date.today() - timedelta(days=30)
         default_end_date = date.today()
 
-        # Function to convert string to date
         def str_to_date(date_str):
             return datetime.strptime(date_str, "%Y-%m-%d").date()
 
-        # Function to get date from form or session or default
         def get_date(form_field, session_key, default_date):
             form_value = form_field.value()
             if form_value:
@@ -104,7 +101,6 @@ def reports(request):
             date_str = request.session.get(session_key)
             return str_to_date(date_str) if date_str else default_date
 
-        # Determine the start and end dates for each form
         start_date_enrollment = get_date(form_enrollment['start_date_enrollment'], 'start_date_enrollment', default_start_date)
         end_date_enrollment = get_date(form_enrollment['end_date_enrollment'], 'end_date_enrollment', default_end_date)
 
@@ -117,13 +113,11 @@ def reports(request):
         start_date_course = get_date(form_course['start_date_course'], 'start_date_course', default_start_date)
         end_date_course = get_date(form_course['end_date_course'], 'end_date_course', default_end_date)
 
-        # Generate data based on the date range
         enrollment_data = courses_enrollment(start_date_enrollment, end_date_enrollment)
         rating_data = top_rated_courses(start_date_rating, end_date_rating)
         user_data = user_completed_courses(start_date_user, end_date_user)
         course_data = courses_completed_count(start_date_course, end_date_course)
 
-        # Save the dates as strings to the session for future requests
         request.session['enrollment_data'] = enrollment_data
         request.session['start_date_enrollment'] = start_date_enrollment.strftime("%Y-%m-%d")
         request.session['end_date_enrollment'] = end_date_enrollment.strftime("%Y-%m-%d")
