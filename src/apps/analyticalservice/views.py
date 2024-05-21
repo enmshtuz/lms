@@ -79,15 +79,14 @@ def courses_completed_count(start_date, end_date):
 @login_required
 
 # Create your views here.
+@login_required
 def reports(request):
     if request.user.username == 'admin':
-        # Initialize forms with initial values
         form_enrollment = EnrollmentForm(request.GET or None)
         form_rating = RatingForm(request.GET or None)
         form_user = UserForm(request.GET or None)
         form_course = CourseForm(request.GET or None)
         
-        # Use form data or default to initial values
         start_date_enrollment = form_enrollment['start_date_enrollment'].value() or date.today() - timedelta(days=30)
         end_date_enrollment = form_enrollment['end_date_enrollment'].value() or date.today()
         start_date_rating = form_rating['start_date_rating'].value() or date.today() - timedelta(days=30)
@@ -97,27 +96,29 @@ def reports(request):
         start_date_course = form_course['start_date_course'].value() or date.today() - timedelta(days=30)
         end_date_course = form_course['end_date_course'].value() or date.today()
 
-        # Retrieve existing session data if available
-        enrollment_data = request.session.get('enrollment_data')
-        rating_data = request.session.get('rating_data')
-        user_data = request.session.get('user_data')
-        course_data = request.session.get('course_data')
-
-        if start_date_enrollment and end_date_enrollment:
+        if 'start_date_enrollment' in request.GET or 'end_date_enrollment' in request.GET:
             enrollment_data = courses_enrollment(start_date_enrollment, end_date_enrollment)
             request.session['enrollment_data'] = enrollment_data
+        else:
+            enrollment_data = request.session.get('enrollment_data')
 
-        if start_date_rating and end_date_rating:
+        if 'start_date_rating' in request.GET or 'end_date_rating' in request.GET:
             rating_data = top_rated_courses(start_date_rating, end_date_rating)
             request.session['rating_data'] = rating_data
+        else:
+            rating_data = request.session.get('rating_data')
 
-        if start_date_user and end_date_user:
+        if 'start_date_user' in request.GET or 'end_date_user' in request.GET:
             user_data = user_completed_courses(start_date_user, end_date_user)
             request.session['user_data'] = user_data
+        else:
+            user_data = request.session.get('user_data')
 
-        if start_date_course and end_date_course:
+        if 'start_date_course' in request.GET or 'end_date_course' in request.GET:
             course_data = courses_completed_count(start_date_course, end_date_course)
             request.session['course_data'] = course_data
+        else:
+            course_data = request.session.get('course_data')
 
         context = {
             'form_enrollment': form_enrollment,
@@ -131,7 +132,9 @@ def reports(request):
         }
 
         return render(request, 'reports.html', context)
-    
+
+
+
 @login_required
 
 def logoutUser(request):
