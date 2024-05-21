@@ -28,7 +28,7 @@ class Course(models.Model):
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
     publish_date = models.DateTimeField(default=timezone.now)
     is_published = models.BooleanField(default=False)
-    # published_date = models.DateTimeField(null=True, blank=True)
+    publish_date = models.DateTimeField(null=True, blank=True)
     file = models.FileField(upload_to='course_files/', null=True, blank=True)
     video = models.FileField(upload_to='course_videos/', null=True, blank=True)
     url = models.URLField(max_length=200, null=True, blank=True)

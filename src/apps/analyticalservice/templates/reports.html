@@ -1,133 +1,211 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            color: #666;
-        }
-    </style>
-</head>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Reports</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f0f0f0;
+                    margin: 0;
+                    padding: 0;
+                }
+                
+                .container {
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background-color: #ffffff; /* White background */
+                    border-radius: 8px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+                .section-heading {
+                    color: #333333;
+                    margin-bottom: 20px;
+                }
+                
+                .section-description {
+                    color: #666666; /* Medium gray */
+                    margin-bottom: 10px;
+                }
+                
+                .form-container {
+                    margin-bottom: 20px;
+                }
+                
+                .submit-button {
+                    padding: 10px 20px;
+                    background-color: #fa2dd0; /* Blue */
+                    color: #ffffff; /* White */
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                }
+                
+                .submit-button:hover {
+                    background-color: #a11675;
+                    transition: background-color 0.3s;
+                }
+                
+                .result-list {
+                    list-style: none;
+                    padding: 0;
+                }
+                
+                .result-list-item {
+                    margin-bottom: 10px;
+                    background-color: #f9f9f9; /* Light gray background */
+                    padding: 15px;
+                    border-radius: 6px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    transition: background-color 0.3s;
+                    
+                }
+                .logout-container {
+                    text-align: right;
+
+                }
+                
+                .logout {
+                    margin-left: auto; 
+                    text-decoration: none;
+                    background-color: #110f94;
+                }
+                .logout:hover{
+                    background-color: #0a085c;
+                    transition: background-color 0.3s;
+                }
+            </style>
+        </head>
 <body>
     
     <!-- Enrollment Form -->
-    <div class="container">
-        <h1>Welcome to My Website</h1>
-        <a href="{% url 'logout' %}">Logout</a>
+    <div id="enrollment-form" class="container">
+            <div class="logout-container">
+            <a href="{% url 'logout' %}" class="logout submit-button">Logout</a>
+        </div>
         <br>
-        <br>
+        <br> 
         <br>
         <br>
         {# Enrollment form #}
-        <h1>Top 10 Courses by Enrollment</h1>
-        <form action="{% url 'reports' %}" method="GET">
+        <h1 class="section-heading">Top 10 Courses by Enrollment</h1>
+        <div id = "enrollment-div">
+         <form action="{% url 'reports' %}" method="GET" id="enrollment-form">
+            <br>
+            <br>
             {% csrf_token %}
+            <div class="result-list-item">
             {{  form_enrollment }}
+        </div>
             <br>
-            <button type="submit" value="form_enrollment" name ="form_enrollment">Submit</button>
-        </form>
+             <button type="submit" class="submit-button" value="form_enrollment" name ="form_enrollment">Submit</button>
+         </form>
+    </div>
             <br>
             <br>
-            <ul>
+            <ul id="enrollment-results" class="result-list ">
                 {% if enrollment_data %}
                     {% for course in enrollment_data %}
-                        <li>{{ course.0 }} - {{ course.1 }}</li>
+                        <li class="result-list-item">{{ course.0 }} - {{ course.1 }}</li>
                     {% endfor %}
                 {% else %}
                     <li>No enrollment data available for the selected date range.</li>
                 {% endif %}
             </ul>
             <br>
-
+            <br>
+            <br>
+            <br>
+            <br>
             {# Rating form #}
             <br>
-            <h1>Top 10 Courses by rating</h1>
+            <h1 class="section-heading">Top 10 Courses by Rating</h1>
 
             <br>
     
-        <form action="{% url 'reports' %}" method="GET">
+        <form action="{% url 'reports' %}" method="GET" id="rating-form">
             {% csrf_token %}
-            {{  form_rating }}
             <br>
-            <button type="submit" value="form_rating" name="form_rating">Submit</button>
+            <br>
+            <div class="result-list-item">
+            {{  form_rating }}
+            </div>
+            <br>
+            <button type="submit" class="submit-button" value="form_rating" name="form_rating">Submit</button>
         </form>
             <br>
             <br>
-            <ul>
+            <ul id="rating-results" class="result-list">
                 {% if rating_data %}
                     {% for course in rating_data %}
-                        <li>{{ course.0 }} - {{ course.1 }}</li>
+                        <li class="result-list-item">{{ course.0 }} - {{ course.1 }}</li>
                     {% endfor %}
                 {% else %}
                     <li>No enrollment data available for the selected date range.</li>
                 {% endif %}
             </ul>
             <br>
-
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
             {# User form #}
             <br>
-            <h1>Top 10 Users by completed courses</h1>
+            <h1 class="section-heading">Top 10 Users by Completed Courses</h1>
 
             <br>
-            <form action="{% url 'reports' %}" method="GET" id>
+            <form action="{% url 'reports' %}" method="GET" id="user-form">
                 {% csrf_token %}
-                {{  form_user }}
                 <br>
-                <button type="submit" value="form_user" name="form_user">Submit</button>
+                <br>
+                <div class="result-list-item">
+                {{  form_user }}
+                </div>
+                <br>
+                <button type="submit" class="submit-button" value="form_user" name="form_user">Submit</button>
             </form>
                 <br>
                 <br>
-                <ul>
+                <ul id="user-results" class="result-list">
                     {% if user_data %}
                         {% for user in user_data %}
-                            <li>{{ user.username }} - {{ user.completed_courses_count }}</li>
+                            <li class="result-list-item">{{ user.username }} - {{ user.completed_courses_count }}</li>
                         {% endfor %}
                     {% else %}
                         <li>No enrollment data available for the selected date range.</li>
                     {% endif %}
                 </ul>
-
+                <br>
+                <br>
+                <br>
+                <br>
                 {# Course form #}    
                 <br>
                 <br>
-                <h1>Top 10 Courses by completed courses</h1>
-    
-                <br>
-                <form action="{% url 'reports' %}" method="GET" id>
+                <h1 class="section-heading">Top 10 Courses by Completion Number</h1>
+                <form action="{% url 'reports' %}" method="GET" id="course-form">
                     {% csrf_token %}
-                    {{  form_course }}
                     <br>
-                    <button type="submit" value="form_course" name="form_course">Submit</button>
+                    <br>
+                    <div class="result-list-item">
+                    {{  form_course }}
+                    </div>
+                    <br>
+                    <button type="submit" class="submit-button" value="form_course" name="form_course">Submit</button>
                 </form>
                     <br>
                     <br>
-                    <ul>
+                    <ul id="course-results" class="result-list">
                         {% if course_data %}
                             {% for course in course_data %}
-                                <li>{{ course.course_title }} - {{ course.completed_count }}</li>
+                                <li class="result-list-item">{{ course.course_title }} - {{ course.completed_count }}</li>
                             {% endfor %}
                         {% else %}
                             <li>No enrollment data available for the selected date range.</li>
                         {% endif %}
                     </ul>
 </body>
+
 </html>
-
-
-

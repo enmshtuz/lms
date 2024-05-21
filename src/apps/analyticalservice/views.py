@@ -9,6 +9,7 @@ from .models import Course  # Make sure to import the Course model
 from .models import Enrollment, Feedback
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
+from datetime import date, timedelta
 
 
 
@@ -75,23 +76,27 @@ def courses_completed_count(start_date, end_date):
     ]
     return course_data
 
+@login_required
 
 # Create your views here.
-@login_required
 def reports(request):
     if request.user.username == 'admin':
-        form_enrollment =  EnrollmentForm()
-        start_date_enrollment = request.GET.get('start_date_enrollment')
-        end_date_enrollment = request.GET.get('end_date_enrollment')
-        form_rating = RatingForm()
-        start_date_rating = request.GET.get('start_date_rating')
-        end_date_rating = request.GET.get('end_date_rating')
-        form_user = UserForm()
-        start_date_user = request.GET.get('start_date_user')
-        end_date_user = request.GET.get('end_date_user')
-        form_course = CourseForm()
-        start_date_course = request.GET.get('start_date_course')
-        end_date_course = request.GET.get('end_date_course')
+        # Initialize forms with initial values
+        form_enrollment = EnrollmentForm(request.GET or None)
+        form_rating = RatingForm(request.GET or None)
+        form_user = UserForm(request.GET or None)
+        form_course = CourseForm(request.GET or None)
+        
+        # Use form data or default to initial values
+        start_date_enrollment = form_enrollment['start_date_enrollment'].value() or date.today() - timedelta(days=30)
+        end_date_enrollment = form_enrollment['end_date_enrollment'].value() or date.today()
+        start_date_rating = form_rating['start_date_rating'].value() or date.today() - timedelta(days=30)
+        end_date_rating = form_rating['end_date_rating'].value() or date.today()
+        start_date_user = form_user['start_date_user'].value() or date.today() - timedelta(days=30)
+        end_date_user = form_user['end_date_user'].value() or date.today()
+        start_date_course = form_course['start_date_course'].value() or date.today() - timedelta(days=30)
+        end_date_course = form_course['end_date_course'].value() or date.today()
+
         # Retrieve existing session data if available
         enrollment_data = request.session.get('enrollment_data')
         rating_data = request.session.get('rating_data')
@@ -101,31 +106,19 @@ def reports(request):
         if start_date_enrollment and end_date_enrollment:
             enrollment_data = courses_enrollment(start_date_enrollment, end_date_enrollment)
             request.session['enrollment_data'] = enrollment_data
-            # Save enrollment_data in session if not already present
-            if not request.session.get('enrollment_data'):
-                request.session['enrollment_data'] = enrollment_data
 
         if start_date_rating and end_date_rating:
             rating_data = top_rated_courses(start_date_rating, end_date_rating)
             request.session['rating_data'] = rating_data
-            # Save rating_data in session if not already present
-            if not request.session.get('rating_data'):
-                request.session['rating_data'] = rating_data
 
         if start_date_user and end_date_user:
             user_data = user_completed_courses(start_date_user, end_date_user)
             request.session['user_data'] = user_data
-            # Save user_data in session if not already present
-            if not request.session.get('user_data'):
-                request.session['user_data'] = user_data
-                
+
         if start_date_course and end_date_course:
             course_data = courses_completed_count(start_date_course, end_date_course)
             request.session['course_data'] = course_data
-            # Save user_data in session if not already present
-            if not request.session.get('course_data'):
-                request.session['course_data'] = course_data
-                
+
         context = {
             'form_enrollment': form_enrollment,
             'enrollment_data': enrollment_data,
@@ -137,14 +130,10 @@ def reports(request):
             'course_data': course_data
         }
 
-        print(start_date_course)
-        print(end_date_course)
-        print(course_data)
         return render(request, 'reports.html', context)
-
+    
 @login_required
 
 def logoutUser(request):
     logout(request)
     return redirect("reports")
-
