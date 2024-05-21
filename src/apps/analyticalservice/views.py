@@ -131,6 +131,7 @@ def reports(request):
             'course_data': course_data
         }
 
+
         return render(request, 'reports.html', context)
 
 
