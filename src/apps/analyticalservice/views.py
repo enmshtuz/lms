@@ -9,7 +9,7 @@ from .models import Course
 from .models import Enrollment, Feedback
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 
 
@@ -76,7 +76,8 @@ def courses_completed_count(start_date, end_date):
     ]
     return course_data
 
-@login_required
+
+
 
 
 @login_required
@@ -86,39 +87,58 @@ def reports(request):
         form_rating = RatingForm(request.GET or None)
         form_user = UserForm(request.GET or None)
         form_course = CourseForm(request.GET or None)
-        
-        start_date_enrollment = form_enrollment['start_date_enrollment'].value() or date.today() - timedelta(days=30)
-        end_date_enrollment = form_enrollment['end_date_enrollment'].value() or date.today()
-        start_date_rating = form_rating['start_date_rating'].value() or date.today() - timedelta(days=30)
-        end_date_rating = form_rating['end_date_rating'].value() or date.today()
-        start_date_user = form_user['start_date_user'].value() or date.today() - timedelta(days=30)
-        end_date_user = form_user['end_date_user'].value() or date.today()
-        start_date_course = form_course['start_date_course'].value() or date.today() - timedelta(days=30)
-        end_date_course = form_course['end_date_course'].value() or date.today()
 
-        if 'start_date_enrollment' in request.GET or 'end_date_enrollment' in request.GET:
-            enrollment_data = courses_enrollment(start_date_enrollment, end_date_enrollment)
-            request.session['enrollment_data'] = enrollment_data
-        else:
-            enrollment_data = request.session.get('enrollment_data')
+        # Set default start and end dates for the last 30 days
+        default_start_date = date.today() - timedelta(days=30)
+        default_end_date = date.today()
 
-        if 'start_date_rating' in request.GET or 'end_date_rating' in request.GET:
-            rating_data = top_rated_courses(start_date_rating, end_date_rating)
-            request.session['rating_data'] = rating_data
-        else:
-            rating_data = request.session.get('rating_data')
+        # Function to convert string to date
+        def str_to_date(date_str):
+            return datetime.strptime(date_str, "%Y-%m-%d").date()
 
-        if 'start_date_user' in request.GET or 'end_date_user' in request.GET:
-            user_data = user_completed_courses(start_date_user, end_date_user)
-            request.session['user_data'] = user_data
-        else:
-            user_data = request.session.get('user_data')
+        # Function to get date from form or session or default
+        def get_date(form_field, session_key, default_date):
+            form_value = form_field.value()
+            if form_value:
+                return str_to_date(form_value)
+            date_str = request.session.get(session_key)
+            return str_to_date(date_str) if date_str else default_date
 
-        if 'start_date_course' in request.GET or 'end_date_course' in request.GET:
-            course_data = courses_completed_count(start_date_course, end_date_course)
-            request.session['course_data'] = course_data
-        else:
-            course_data = request.session.get('course_data')
+        # Determine the start and end dates for each form
+        start_date_enrollment = get_date(form_enrollment['start_date_enrollment'], 'start_date_enrollment', default_start_date)
+        end_date_enrollment = get_date(form_enrollment['end_date_enrollment'], 'end_date_enrollment', default_end_date)
+
+        start_date_rating = get_date(form_rating['start_date_rating'], 'start_date_rating', default_start_date)
+        end_date_rating = get_date(form_rating['end_date_rating'], 'end_date_rating', default_end_date)
+
+        start_date_user = get_date(form_user['start_date_user'], 'start_date_user', default_start_date)
+        end_date_user = get_date(form_user['end_date_user'], 'end_date_user', default_end_date)
+
+        start_date_course = get_date(form_course['start_date_course'], 'start_date_course', default_start_date)
+        end_date_course = get_date(form_course['end_date_course'], 'end_date_course', default_end_date)
+
+        # Generate data based on the date range
+        enrollment_data = courses_enrollment(start_date_enrollment, end_date_enrollment)
+        rating_data = top_rated_courses(start_date_rating, end_date_rating)
+        user_data = user_completed_courses(start_date_user, end_date_user)
+        course_data = courses_completed_count(start_date_course, end_date_course)
+
+        # Save the dates as strings to the session for future requests
+        request.session['enrollment_data'] = enrollment_data
+        request.session['start_date_enrollment'] = start_date_enrollment.strftime("%Y-%m-%d")
+        request.session['end_date_enrollment'] = end_date_enrollment.strftime("%Y-%m-%d")
+
+        request.session['rating_data'] = rating_data
+        request.session['start_date_rating'] = start_date_rating.strftime("%Y-%m-%d")
+        request.session['end_date_rating'] = end_date_rating.strftime("%Y-%m-%d")
+
+        request.session['user_data'] = user_data
+        request.session['start_date_user'] = start_date_user.strftime("%Y-%m-%d")
+        request.session['end_date_user'] = end_date_user.strftime("%Y-%m-%d")
+
+        request.session['course_data'] = course_data
+        request.session['start_date_course'] = start_date_course.strftime("%Y-%m-%d")
+        request.session['end_date_course'] = end_date_course.strftime("%Y-%m-%d")
 
         context = {
             'form_enrollment': form_enrollment,
@@ -131,9 +151,7 @@ def reports(request):
             'course_data': course_data
         }
 
-
         return render(request, 'reports.html', context)
-
 
 
 @login_required
