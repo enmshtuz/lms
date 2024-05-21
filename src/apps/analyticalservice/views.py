@@ -3,9 +3,9 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django import forms
 from .forms import EnrollmentForm, RatingForm, UserForm, CourseForm
-from django.db import models  # Import models module here
+from django.db import models  
 from django.db.models import Count, Avg
-from .models import Course  # Make sure to import the Course model
+from .models import Course  
 from .models import Enrollment, Feedback
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
@@ -78,7 +78,7 @@ def courses_completed_count(start_date, end_date):
 
 @login_required
 
-# Create your views here.
+
 @login_required
 def reports(request):
     if request.user.username == 'admin':
